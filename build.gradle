@@ -1,0 +1,32 @@
+buildscript {
+    ext {
+        kotlin_version = '1.5.21'
+        compose_version = '1.0.2'
+
+    }
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:7.0.2"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'org.jlleitschuh.gradle:ktlint-gradle:10.2.0'
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.5.30"
+    }
+}
+
+plugins {
+    id("org.jetbrains.dokka") version "1.5.30"
+}
+
+subprojects {
+    apply plugin: 'org.jlleitschuh.gradle.ktlint'
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

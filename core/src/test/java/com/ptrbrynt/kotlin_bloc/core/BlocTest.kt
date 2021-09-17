@@ -1,0 +1,161 @@
+package com.ptrbrynt.kotlin_bloc.core
+
+import app.cash.turbine.test
+import com.ptrbrynt.kotlin_bloc.core.blocs.CounterBloc
+import com.ptrbrynt.kotlin_bloc.core.blocs.CounterEvent
+import com.ptrbrynt.kotlin_bloc.core.blocs.DebounceBloc
+import com.ptrbrynt.kotlin_bloc.core.blocs.IncrementOnlyCounterBloc
+import com.ptrbrynt.kotlin_bloc.core.blocs.SeededBloc
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.runBlocking
+import org.junit.Test
+import kotlin.system.measureTimeMillis
+import kotlin.test.assertContains
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+
+@FlowPreview
+@ExperimentalTime
+@ExperimentalCoroutinesApi
+internal class BlocTest {
+    @Test
+    fun `CounterBloc initial state is 0`() = runBlocking {
+        val bloc = CounterBloc()
+
+        assertEquals(0, bloc.state)
+    }
+
+    @Test
+    fun `CounterBloc emits correct states`() = runBlocking {
+        val bloc = CounterBloc()
+
+        bloc.stateFlow.test {
+            bloc.add(CounterEvent.Increment)
+
+            assertEquals(1, awaitItem())
+
+            bloc.add(CounterEvent.Increment)
+
+            assertEquals(2, awaitItem())
+
+            bloc.add(CounterEvent.Decrement)
+
+            assertEquals(1, awaitItem())
+        }
+    }
+
+    @Test
+    fun `CounterBloc onEvent callback is invoked for all events`() = runBlocking {
+        val events = mutableListOf<CounterEvent>()
+        val bloc = CounterBloc(
+            onEventCallback = {
+                events.add(it)
+            }
+        )
+
+        bloc.stateFlow.test {
+            bloc.add(CounterEvent.Increment)
+            bloc.add(CounterEvent.Decrement)
+
+            assertContains(events, CounterEvent.Increment)
+            assertContains(events, CounterEvent.Decrement)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `CounterBloc state value stays up-to-date`() = runBlocking {
+        val bloc = CounterBloc()
+
+        bloc.stateFlow.test {
+
+            bloc.add(CounterEvent.Increment)
+
+            assertEquals(1, bloc.state)
+
+            bloc.add(CounterEvent.Increment)
+
+            assertEquals(2, bloc.state)
+
+            bloc.add(CounterEvent.Decrement)
+
+            assertEquals(1, bloc.state)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `CounterBloc onTransition callback works as expected`() = runBlocking {
+        var transition: Transition<CounterEvent, Int>? = null
+        val bloc = CounterBloc(
+            onTransitionCallback = {
+                transition = it
+            }
+        )
+
+        bloc.stateFlow.test {
+            bloc.add(CounterEvent.Increment)
+
+            assertEquals(
+                Transition(0, CounterEvent.Increment, 1),
+                transition,
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `SeededBloc emits correct states`() = runBlocking {
+        val bloc = SeededBloc(listOf(1, 2), 0)
+
+        assertEquals(0, bloc.state)
+
+        bloc.stateFlow.test {
+            bloc.add("Hello")
+
+            assertEquals(1, awaitItem())
+
+            assertEquals(2, awaitItem())
+        }
+    }
+
+    @Test
+    fun `DebounceBloc emits correct states`() = runBlocking {
+        val bloc = DebounceBloc()
+
+        bloc.stateFlow.test(Duration.seconds(2.5)) {
+            val time = measureTimeMillis {
+                bloc.add(CounterEvent.Increment)
+
+                assertEquals(1, awaitItem())
+            }
+
+            assertTrue(time >= 2000)
+        }
+    }
+
+    @Test
+    fun `IncrementOnlyCounterBloc only responds to Increment events`() = runBlocking {
+        val bloc = IncrementOnlyCounterBloc()
+
+        bloc.stateFlow.test {
+            bloc.add(CounterEvent.Increment)
+
+            assertEquals(1, awaitItem())
+
+            bloc.add(CounterEvent.Decrement)
+
+            expectNoEvents()
+
+            bloc.add(CounterEvent.Increment)
+
+            assertEquals(2, awaitItem())
+        }
+    }
+}
