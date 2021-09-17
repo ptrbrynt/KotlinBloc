@@ -9,6 +9,7 @@ plugins {
 publishing {
     publications {
         release(MavenPublication) {
+            from components.java
             groupId = "com.ptrbrynt.kotlin-bloc"
             artifactId = "core"
         }

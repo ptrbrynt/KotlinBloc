@@ -5,11 +5,14 @@ plugins {
     id 'maven-publish'
 }
 
-publishing {
-    publications {
-        release(MavenPublication) {
-            groupId = "com.ptrbrynt.kotlin-bloc"
-            artifactId = "compose"
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = "com.ptrbrynt.kotlin-bloc"
+                artifactId = "compose"
+            }
         }
     }
 }
