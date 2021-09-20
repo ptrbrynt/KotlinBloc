@@ -25,7 +25,7 @@ allprojects {
 
 Then add the dependency to your module-level `build.gradle` file. 
 
-**Note: you only need one of the two available dependencies. The `compose` library includes the `core` library.
+!> Note: you only need one of the two available dependencies. The `compose` library includes the `core` library.
 
 ```groovy
 dependencies {
