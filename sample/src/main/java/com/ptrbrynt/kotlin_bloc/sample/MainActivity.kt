@@ -70,6 +70,7 @@ fun CubitCounter() {
     )
 }
 
+@FlowPreview
 @Composable
 fun CounterBase(
     bloc: BlocBase<Int>,

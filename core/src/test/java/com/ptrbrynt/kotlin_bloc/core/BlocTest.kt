@@ -88,7 +88,6 @@ internal class BlocTest {
 
         assertContains(events, CounterEvent.Increment)
         assertContains(events, CounterEvent.Decrement)
-
     }
 
     @Test
@@ -106,7 +105,6 @@ internal class BlocTest {
         bloc.add(CounterEvent.Decrement)
 
         assertEquals(1, bloc.state)
-
     }
 
     @Test

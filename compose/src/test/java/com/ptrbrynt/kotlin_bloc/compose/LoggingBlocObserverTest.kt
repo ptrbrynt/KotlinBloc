@@ -7,13 +7,13 @@ import com.ptrbrynt.kotlin_bloc.compose.blocs.CounterEvent
 import com.ptrbrynt.kotlin_bloc.core.Bloc
 import io.mockk.mockk
 import io.mockk.verifyOrder
+import java.io.PrintStream
 import kotlinx.coroutines.FlowPreview
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
-import java.io.PrintStream
 
 @FlowPreview
 @RunWith(AndroidJUnit4::class)
