@@ -236,6 +236,59 @@ suspend fun main() {
 }
 ```
 
+## BlocObserver
+
+Most applications will include a potentially large number of `Bloc`s and `Cubit`s. Implementing observation on every one of these classes individually can be cumbserome, especially if you want to do the same thing for each `Bloc` and `Cubit`.
+
+To that end, the library includes a way of creating a global `BlocObserver`. 
+
+```kotlin
+/**
+ * A [BlocObserver] which logs all bloc events to the console.
+ */
+class LoggingBlocObserver : BlocObserver() {
+
+    override fun <B : BlocBase<State>, State> onCreate(bloc: B) {
+        super.onCreate(bloc)
+        Log.i(bloc::class.qualifiedName, "Created")
+    }
+
+    override fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {
+        super.onChange(bloc, change)
+        Log.i(bloc::class.qualifiedName, change.toString())
+    }
+
+    override fun <B : Bloc<Event, State>, Event, State> onEvent(bloc: B, event: Event) {
+        super.onEvent(bloc, event)
+        Log.i(bloc::class.qualifiedName, "Event: $event")
+    }
+
+    override fun <B : Bloc<Event, State>, Event, State> onTransition(
+        bloc: B,
+        transition: Transition<Event, State>,
+    ) {
+        super.onTransition(bloc, transition)
+        Log.i(bloc::class.qualifiedName, transition.toString())
+    }
+}
+```
+
+?> All methods in `BlocObserver` subclasses are optional; if you omit a particular handler method, the observer will do nothing.
+
+?> This implementation of `LoggingBlocObserver` is actually available as part of the `compose` library. You're welcome 😊
+
+To apply your global observer, add this code before you create and use any `Bloc`s or `Cubit`s:
+
+```kotlin
+Bloc.observer = LoggingBlocObserver()
+```
+
+If you want to stop logging at any point, you can set this to use `SilentBlocObserver`:
+
+```kotlin
+Bloc.observer = SilentBlocObserver()
+```
+
 ## Cubit vs. Bloc
 
 You might be wondering whether to use `Cubit` or `Bloc`. There are advantages to each!
