@@ -1,5 +1,7 @@
 # Core Concepts
 
+?> The concepts and classes described on this page apply to the `core` and `compose` libraries, and can be used in any Kotlin application.
+
 ## Kotlin Flow
 
 ?> Check out the [official Flow documentation](https://kotlinlang.org/docs/flow.html) for more information about Flow.
@@ -157,7 +159,7 @@ Creating a `Bloc` is similar to creating a `Cubit` except, in addition to defini
 > Events are input to a Bloc. They are commonly added in response to user interactions such as button presses, or lifecycle events like page loads.
 
 ```kotlin
-enum class CounterEvent { Increment }
+enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
   // ...
@@ -171,7 +173,7 @@ Just like when creating the `CounterCubit`, we must specify an initial state by 
 Using `Bloc` requires us to override the `mapEventToState` method. This will be responsible for converting any incoming events into zero or more outgoing states.
 
 ```kotlin
-enum class CounterEvent { Increment }
+enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
   override fun mapEventToState(event: CounterEvent): Flow<Int> = flow {
@@ -182,21 +184,21 @@ class CounterBloc: Bloc<CounterEvent, Int>(0) {
 
 > **Tip**: Notice we're using the `flow` builder syntax.
 
-We can then update `mapEventToState` to handle the `CounterEvent.Increment` event:
+We can then update `mapEventToState` to handle the `CounterEvent.Incremented` event:
 
 ```kotlin
-enum class CounterEvent { Increment }
+enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
   override fun mapEventToState(event: CounterEvent): Flow<Int> = flow {
     when (event) {
-      CounterEvent.Increment -> emit(state + 1)
+      CounterEvent.Incremented -> emit(state + 1)
     }
   }
 }
 ```
 
-In the above snippet, we are using a `when` statement to check the type of `event` we're handling. If it's an `Increment` event, we are `emit`ting a new state.
+In the above snippet, we are using a `when` statement to check the type of `event` we're handling. If it's an `Incremented` event, we are `emit`ting a new state.
 
 > **Note**: The `emit` method we're calling here is the standard `emit` method provided by the `flow` builder syntax.
 
@@ -212,13 +214,13 @@ At this point, we can create a new instance of our `CounterBloc` and put it to u
 suspend fun main() {
   val bloc = CounterBloc()
   println(bloc.state) // 0
-  bloc.add(CounterEvent.Increment)
+  bloc.add(CounterEvent.Incremented)
   delay(100)
   print(bloc.state) // 1
 }
 ```
 
-In the above snippet, we start by creating a new instance of [CounterBloc]. We then print the current state of the `Bloc` which is the initial state. Next, we add the `Increment` event to trigger a state change. Finally, we print the state of the `Bloc` again, which has now changed to `1`.
+In the above snippet, we start by creating a new instance of `CounterBloc`. We then print the current state of the `Bloc` which is the initial state. Next, we add the `Incremented` event to trigger a state change. Finally, we print the state of the `Bloc` again, which has now changed to `1`.
 
 #### Flow Usage
 
@@ -230,62 +232,106 @@ suspend fun main() {
   scope.launch {
     bloc.collect { println(it) }
   }
-  bloc.add(CounterEvent.Increment)
+  bloc.add(CounterEvent.Incremented)
 }
 ```
 
-## BlocComposer
+## Cubit vs. Bloc
 
-`BlocComposer` is a composable which takes a `bloc` and a `content` composable. `BlocComposer` handles composing the content in response to new states.
+You might be wondering whether to use `Cubit` or `Bloc`. There are advantages to each!
 
-?> See `BlocListener` if you want to "do" anything in response to state changes (e.g. navigation, showing a dialog etc)
+### Cubit Advantages
+
+#### Simplicity
+
+One of the biggest advantages of using `Cubit` is simplicity. When creating a `Cubit`, we only have to define the state and the methods we want to expose to change the state. By comparison, when creating a `Bloc`, we have to define the states, events, and how they are mapped. This makes `Cubit` easier to understand and more concise.
+
+Here's an example of a `CounterCubit`, and a `CounterBloc` with equivalent functionality.
+
+##### CounterCubit
 
 ```kotlin
-val bloc = remember { CounterBloc() }
-BlocComposer(bloc) { state ->
-  // Compose views here based on the current state
+class CounterCubit : Cubit<Int>(0) {
+  fun increment = emit(state + 1)
 }
 ```
 
-For fine-grained control over when the `content` function is re-composed, you can add a `composeWhen`. This takes the new state and returns a boolean. If `composeWhen` returns true, the `content` will be updated with the new state. If `composeWhen` returns false, the `content` will not receive the new state.
+##### CounterBloc
 
 ```kotlin
-val bloc = remember { CounterBloc() }
+enum class CounterEvent { Increment }
 
-BlocComposer(
-  bloc,
-  // Only compose for even numbers
-  composeWhen = { state -> state % 2 == 0 },
-) { state ->
-  // Compose views here based on the current state
+class CounterBloc : Bloc<CounterEvent, Int>(0) {
+  override fun mapEventToState(event: CounterEvent) = flow {
+    when (event) {
+      is CounterEvent.Increment -> emit(state + 1)
+    }
+  }
 }
 ```
 
-## BlocListener
+The `Cubit` implementation is much more concise, and instead of defining events separately the methods act like events. In addition, when using a `Cubit`, we don't have to use the `flow` builder syntax or even understand how it works; we simply call `emit` from anywhere in order to trigger a state change.
 
-`BlocListener` is a composable which takes a `bloc` and an `onState` callback. `onState` is invoked whenever the `bloc` emits a new state.
+### Bloc Advantages
 
-`BlocListener` should be used to handle [side-effects](https://developer.android.com/jetpack/compose/side-effects) e.g. showing a dialog, or navigation.
+#### Traceability
+
+One of the biggest advantages of `Bloc` is that you can track much more precisely the sequence of state changes as well as exactly what triggered those changes. For state that is critical to the functionality of an application, it might be beneficial to use a more event-driven approach in order to capture all events in addition to state changes.
+
+A common use case might be managing `AuthenticationState`. In our example we'll represent this as an `enum class` for simplicity.
 
 ```kotlin
-val bloc = remember { CounterBloc() }
+enum class AuthenticationState { Unknown, Authenticated, Unauthenticated }
+```
 
-BlocListener(bloc) { state -> 
-  // Do something here based on the bloc state
+There could be many reasons for the application state to change from `Authenticated` to `Unauthenticated`. The user might have tapped the logout button, or perhaps the user's access token was revoked. When using `Bloc`, we can clearly trace how the application ended up in a particular state.
+
+```
+Transition {
+  state: AuthenticationState.Authenticated,
+  event: LogoutRequested,
+  nextState: AuthenticationState.Unauthenticated
 }
 ```
 
-For fine-grained control over when the `onState` callback is invoked, an optional `reactWhen` can be provided. This takes the new state and returns a boolean. If `reactWhen` returns true, `onState` will be invoked with the new state. If `reactWhen` returns false, the new state will be ignored.
+The above `Transition` gives us all the information we need to understand why the state changed. By contrast, if we had just used a `Cubit`, our logs would only give us a `Change`:
+
+```
+Change {
+  state: AuthenticationState.Authenticated,
+  nextState: AuthenticationState.Unauthenticated
+}
+```
+
+This tells us the user was logged out, but doesn't explain why that happened.
+
+#### Advanced Reactive Operations
+
+Another area in which `Bloc` excels over `Cubit` is when we need to take advantage of reactive operators such as `debounce` and `filter`. 
+
+`Bloc` has an event skink which allows us to control and transform the incoming flow of events.
+
+For example, if we were building real-time search, we would probably want to debounce the requests to the backend in order to avoid getting rate-limited, as well as to cut down on network requests.
+
+With `Bloc`, we can override the `transformEvents` method to change the way incoming events are processed by the `Bloc`.
 
 ```kotlin
-val bloc = remember { CounterBloc() }
-
-BlocListener(
-  bloc,
-  // Only react to even numbers
-  reactWhen = { state -> state % 2 == 0 },
-) { state -> 
-  // Do something here based on the bloc state
+override fun transformEvents(
+  events: Flow<CounterEvent>,
+  transitionFn: (CounterEvent) -> Flow<Transition<CounterEvent, Int>>,
+): Flow<Transition<CounterEvent, Int>> {
+  return super.transformEvents(events.debounce(1000), transitionFn)
 }
 ```
 
+Additionally, `Bloc` provides a `transformTransitions` function which can be overridden to control and transform the outgoing flow of transitions:
+
+```kotlin
+override fun transformTransitions(
+  transitions: Flow<Transition<CounterEvent, Int>>,
+): Flow<Transition<CounterEvent, Int>> {
+  return transitions.filter { it.newState % 2 == 0 } // Only emit states with even numbers
+}
+```
+
+?> As a general tip, if you're unsure about whether to use `Cubit` or `Bloc`, start with `Cubit`. You can always refactor if you need to scale up to `Bloc` later.
