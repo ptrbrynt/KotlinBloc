@@ -6,6 +6,8 @@ import com.ptrbrynt.kotlin_bloc.core.blocs.CounterEvent
 import com.ptrbrynt.kotlin_bloc.core.blocs.DebounceBloc
 import com.ptrbrynt.kotlin_bloc.core.blocs.IncrementOnlyCounterBloc
 import com.ptrbrynt.kotlin_bloc.core.blocs.SeededBloc
+import io.mockk.mockk
+import io.mockk.verifyOrder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
@@ -21,6 +23,31 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 internal class BlocTest {
+
+    @Test
+    fun `CounterBloc calls observer correctly`() = runBlocking {
+        val observer = mockk<BlocObserver>(relaxed = true)
+
+        Bloc.observer = observer
+
+        val bloc = CounterBloc()
+
+        bloc.add(CounterEvent.Increment)
+
+        verifyOrder {
+            observer.onCreate(bloc)
+
+            observer.onEvent(bloc, CounterEvent.Increment)
+
+            observer.onTransition(
+                bloc,
+                Transition(0, CounterEvent.Increment, 1)
+            )
+
+            observer.onChange(bloc, Change(0, 1))
+        }
+    }
+
     @Test
     fun `CounterBloc initial state is 0`() = runBlocking {
         val bloc = CounterBloc()
@@ -56,37 +83,30 @@ internal class BlocTest {
             }
         )
 
-        bloc.stateFlow.test {
-            bloc.add(CounterEvent.Increment)
-            bloc.add(CounterEvent.Decrement)
+        bloc.add(CounterEvent.Increment)
+        bloc.add(CounterEvent.Decrement)
 
-            assertContains(events, CounterEvent.Increment)
-            assertContains(events, CounterEvent.Decrement)
+        assertContains(events, CounterEvent.Increment)
+        assertContains(events, CounterEvent.Decrement)
 
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     @Test
     fun `CounterBloc state value stays up-to-date`() = runBlocking {
         val bloc = CounterBloc()
 
-        bloc.stateFlow.test {
+        bloc.add(CounterEvent.Increment)
 
-            bloc.add(CounterEvent.Increment)
+        assertEquals(1, bloc.state)
 
-            assertEquals(1, bloc.state)
+        bloc.add(CounterEvent.Increment)
 
-            bloc.add(CounterEvent.Increment)
+        assertEquals(2, bloc.state)
 
-            assertEquals(2, bloc.state)
+        bloc.add(CounterEvent.Decrement)
 
-            bloc.add(CounterEvent.Decrement)
+        assertEquals(1, bloc.state)
 
-            assertEquals(1, bloc.state)
-
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     @Test
@@ -98,16 +118,12 @@ internal class BlocTest {
             }
         )
 
-        bloc.stateFlow.test {
-            bloc.add(CounterEvent.Increment)
+        bloc.add(CounterEvent.Increment)
 
-            assertEquals(
-                Transition(0, CounterEvent.Increment, 1),
-                transition,
-            )
-
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertEquals(
+            Transition(0, CounterEvent.Increment, 1),
+            transition,
+        )
     }
 
     @Test

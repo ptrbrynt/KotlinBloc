@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filter
 
 /**
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.filter
  * @param reactWhen Provides more granular control over when [onState] is invoked.
  * @see BlocComposer
  */
+@FlowPreview
 @Composable
 fun <B : BlocBase<State>, State> BlocListener(
     bloc: B,

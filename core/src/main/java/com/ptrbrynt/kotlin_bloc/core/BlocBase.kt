@@ -2,29 +2,41 @@ package com.ptrbrynt.kotlin_bloc.core
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 /**
  * This class contains common functionality for [Bloc] and [Cubit].
  *
  * @param initial The initial [State]
  */
+@Suppress("LeakingThis")
+@FlowPreview
 abstract class BlocBase<State>(initial: State) {
+
+    init {
+        Bloc.observer.onCreate(this)
+    }
 
     protected val scope = CoroutineScope(Dispatchers.Unconfined)
 
-    protected val mutableStateFlow = MutableSharedFlow<State>()
+    protected val mutableStateFlow = MutableSharedFlow<State>().apply {
+        scope.launch {
+            collect { newState ->
+                onChange(Change(state, newState))
+            }
+        }
+    }
 
     /**
      * The current [State] [Flow]
      */
-    val stateFlow: Flow<State> = mutableStateFlow.onEach { newState ->
-        onChange(Change(state = this.state, newState = newState))
-    }
+    val stateFlow: Flow<State> = mutableStateFlow
 
     /**
      * The current [State]
@@ -50,6 +62,7 @@ abstract class BlocBase<State>(initial: State) {
      * ```
      */
     open fun onChange(change: Change<State>) {
+        Bloc.observer.onChange(this, change)
         this.state = change.newState
     }
 

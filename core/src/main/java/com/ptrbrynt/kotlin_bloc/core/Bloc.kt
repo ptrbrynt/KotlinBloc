@@ -71,7 +71,9 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
      * }
      * ```
      */
-    protected open fun onEvent(event: Event) {}
+    protected open fun onEvent(event: Event) {
+        observer.onEvent(this, event)
+    }
 
     /**
      * Called when a new [Transition] occurs.
@@ -90,7 +92,9 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
      * }
      * ```
      */
-    protected open fun onTransition(transition: Transition<Event, State>) {}
+    protected open fun onTransition(transition: Transition<Event, State>) {
+        observer.onTransition(this, transition)
+    }
 
     /**
      * Transforms the [Flow] of [Transition]s into a new [Flow] of [Transition]s.
@@ -150,4 +154,8 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
         events: Flow<Event>,
         transitionFn: (Event) -> Flow<Transition<Event, State>>,
     ) = events.flatMapConcat { transitionFn(it) }
+
+    companion object {
+        var observer: BlocObserver = SilentBlocObserver()
+    }
 }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.filter
 
 /**
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.filter
  * @param composeWhen Provides more granular control over how often [BlocComposer] re-composes.
  * @see BlocListener
  */
+@FlowPreview
 @Composable
 fun <B : BlocBase<State>, State> BlocComposer(
     bloc: B,

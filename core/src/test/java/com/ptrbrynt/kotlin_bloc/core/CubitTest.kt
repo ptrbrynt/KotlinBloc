@@ -3,11 +3,13 @@ package com.ptrbrynt.kotlin_bloc.core
 import app.cash.turbine.test
 import com.ptrbrynt.kotlin_bloc.core.cubits.CounterCubit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
 
+@FlowPreview
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 internal class CubitTest {
@@ -41,22 +43,17 @@ internal class CubitTest {
     fun `CounterCubit state property stays in sync`() = runBlocking {
         val cubit = CounterCubit()
 
-        cubit.stateFlow.test {
+        cubit.increment()
 
-            cubit.increment()
+        assertEquals(1, cubit.state)
 
-            assertEquals(1, cubit.state)
+        cubit.increment()
 
-            cubit.increment()
+        assertEquals(2, cubit.state)
 
-            assertEquals(2, cubit.state)
+        cubit.decrement()
 
-            cubit.decrement()
-
-            assertEquals(1, cubit.state)
-
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertEquals(1, cubit.state)
     }
 
     @Test
@@ -66,12 +63,8 @@ internal class CubitTest {
             change = it
         }
 
-        cubit.stateFlow.test {
-            cubit.increment()
+        cubit.increment()
 
-            assertEquals(Change(0, 1), change)
-
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertEquals(Change(0, 1), change)
     }
 }

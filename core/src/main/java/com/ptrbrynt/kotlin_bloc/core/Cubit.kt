@@ -1,5 +1,6 @@
 package com.ptrbrynt.kotlin_bloc.core
 
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 
 /**
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
  * @param initial The initial [State]
  * @see Bloc
  */
+@FlowPreview
 abstract class Cubit<State>(initial: State) : BlocBase<State>(initial) {
     /**
      * Causes the [Cubit] to emit a new [state].
