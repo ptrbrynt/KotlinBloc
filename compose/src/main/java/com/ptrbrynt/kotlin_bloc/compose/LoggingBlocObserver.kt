@@ -1,0 +1,39 @@
+package com.ptrbrynt.kotlin_bloc.compose
+
+import android.util.Log
+import com.ptrbrynt.kotlin_bloc.core.Bloc
+import com.ptrbrynt.kotlin_bloc.core.BlocBase
+import com.ptrbrynt.kotlin_bloc.core.BlocObserver
+import com.ptrbrynt.kotlin_bloc.core.Change
+import com.ptrbrynt.kotlin_bloc.core.Transition
+import kotlinx.coroutines.FlowPreview
+
+/**
+ * A [BlocObserver] which logs all bloc events to the console.
+ */
+@FlowPreview
+class LoggingBlocObserver : BlocObserver() {
+
+    override fun <B : BlocBase<State>, State> onCreate(bloc: B) {
+        super.onCreate(bloc)
+        Log.i(bloc::class.qualifiedName, "Created")
+    }
+
+    override fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {
+        super.onChange(bloc, change)
+        Log.i(bloc::class.qualifiedName, change.toString())
+    }
+
+    override fun <B : Bloc<Event, State>, Event, State> onEvent(bloc: B, event: Event) {
+        super.onEvent(bloc, event)
+        Log.i(bloc::class.qualifiedName, "Event: $event")
+    }
+
+    override fun <B : Bloc<Event, State>, Event, State> onTransition(
+        bloc: B,
+        transition: Transition<Event, State>,
+    ) {
+        super.onTransition(bloc, transition)
+        Log.i(bloc::class.qualifiedName, transition.toString())
+    }
+}

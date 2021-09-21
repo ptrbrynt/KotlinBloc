@@ -6,7 +6,7 @@ import kotlinx.coroutines.FlowPreview
  * An interface for observing the behavior of [Bloc] instances
  */
 @FlowPreview
-interface BlocObserver {
+abstract class BlocObserver {
     /**
      * Called whenever a [Bloc] or [Cubit] is instantiated.
      *
@@ -15,7 +15,7 @@ interface BlocObserver {
      *
      * @param bloc The [Bloc] or [Cubit] which was created.
      */
-    fun <State> onCreate(bloc: BlocBase<State>)
+    open fun <B : BlocBase<State>, State> onCreate(bloc: B) {}
 
     /**
      * Called whenever an [event] is `add`ed to any [bloc].
@@ -23,7 +23,7 @@ interface BlocObserver {
      * @param bloc The [Bloc] to which the [Event] was `add`ed
      * @param event The [Event] added to the [Bloc]
      */
-    fun <Event, State> onEvent(bloc: Bloc<Event, State>, event: Event)
+    open fun <B : Bloc<Event, State>, Event, State> onEvent(bloc: B, event: Event) {}
 
     /**
      * Called whenever a [Change] occurs in any [Bloc] or [Cubit].
@@ -34,7 +34,7 @@ interface BlocObserver {
      * @param bloc The [Bloc] or [Cubit] which emitted the [change]
      * @param change The [Change] that occurred within the [bloc]
      */
-    fun <State> onChange(bloc: BlocBase<State>, change: Change<State>)
+    open fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {}
 
     /**
      * Called whenever a [Transition] occurs in any [Bloc].
@@ -47,8 +47,9 @@ interface BlocObserver {
      * @param bloc The [Bloc] in which the [transition] occurred
      * @param transition The [Transition] which occurred within the [bloc]
      */
-    fun <Event, State> onTransition(
-        bloc: Bloc<Event, State>,
+    open fun <B : Bloc<Event, State>, Event, State> onTransition(
+        bloc: B,
         transition: Transition<Event, State>,
-    )
+    ) {
+    }
 }
