@@ -95,7 +95,7 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
     /**
      * Transforms the [Flow] of [Transition]s into a new [Flow] of [Transition]s.
      *
-     * By default, [transformTransitions] returns the incoming [transitions] [Stream].
+     * By default, [transformTransitions] returns the incoming [transitions] [Flow].
      *
      * You can override [transformTransitions] for advanced usage in order to
      * manipulate the frequency and specificity at which `transitions` may occur.
