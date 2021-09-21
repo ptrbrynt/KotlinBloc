@@ -32,7 +32,7 @@ dependencies {
   // ...
 
   // Choose EITHER:
-  implementation 'com.github.ptrbrynt.KotlinBloc:compose:0.5' // For Jetpack Compose apps
-  implementation 'com.github.ptrbrynt.KotlinBloc:core:0.5' // The pure Kotlin library, for other stuff
+  implementation 'com.github.ptrbrynt.KotlinBloc:compose:0.9' // For Jetpack Compose apps
+  implementation 'com.github.ptrbrynt.KotlinBloc:core:0.9' // The pure Kotlin library, for other stuff
 }
 ```
