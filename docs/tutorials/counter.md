@@ -95,12 +95,9 @@ fun Counter(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar {
-                Text(
-                    "Counter",
-                    style = MaterialTheme.typography.h6
-                )
-            }
+            TopAppBar(
+                title = { Text("Counter") },
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
