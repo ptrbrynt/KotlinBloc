@@ -91,7 +91,7 @@ Let's create a new file called `Counter.kt`. This will contain our composable fu
 
 @Composable
 fun Counter(
-  scope = rememberCoroutineScope(),
+  scope: CoroutineScope = rememberCoroutineScope(),
   cubit: CounterCubit = remember { CounterCubit() },
 ) {
     Scaffold(
@@ -171,7 +171,7 @@ class CounterCubitTest {
     }
 
     @Test
-    fun increment() {
+    fun increment() = runBlocking {
         val cubit = CounterCubit()
 
         cubit.increment()
@@ -258,7 +258,7 @@ class CounterTest {
 
         rule.onNodeWithContentDescription("Increment").performClick()
 
-        verify {
+        coVerify {
             cubit.increment()
         }
     }
