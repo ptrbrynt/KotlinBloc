@@ -152,18 +152,18 @@ class TodosBloc(private val todoDao: TodoDao) : Bloc<TodosEvent, TodosState>(Tod
       on<TodosInitialized> {
         emitEach(todoDao.getAllTodos().map { TodosLoadSuccess(it) })
       }
-      on<TodoAdded> {
+      on<TodoAdded> { event ->
         todoDao.addTodo(Todo(name = event.name))
       }
-      on<TodoCompleted> {
+      on<TodoCompleted> { event ->
         val todo = todoDao.getTodo(event.id)
         todoDao.updateTodo(todo.copy(completed = true))
       }
-      on<TodoUncompleted> {
+      on<TodoUncompleted> { event ->
         val todo = todoDao.getTodo(event.id)
         todoDao.updateTodo(todo.copy(completed = false))
       }
-      on<TodoDeleted> {
+      on<TodoDeleted> { event ->
         val todo = todoDao.getTodo(event.id)
         todoDao.deleteTodo(todo)
       }
