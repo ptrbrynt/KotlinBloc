@@ -1,11 +1,8 @@
 package com.ptrbrynt.kotlin_bloc.core
 
-import kotlinx.coroutines.FlowPreview
-
 /**
  * An interface for observing the behavior of [Bloc] instances
  */
-@FlowPreview
 abstract class BlocObserver {
     /**
      * Called whenever a [Bloc] or [Cubit] is instantiated.

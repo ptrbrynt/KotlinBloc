@@ -45,7 +45,7 @@ Let's create a new class called `CounterObserver`:
 /**
  * [BlocObserver] for the counter application which observers all state changes
  */
-@FlowPreview
+
 class CounterObserver : BlocObserver() {
     override fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {
         super.onChange(bloc, change)
@@ -76,7 +76,7 @@ The type of state the `CounterCubit` is managing will just be an `Int`, and the 
 
 ```kotlin
 class CounterCubit : Cubit<Int>(0) {
-  fun increment() = emit(state + 1)
+  suspend fun increment() = emit(state + 1)
 }
 ```
 
@@ -88,10 +88,11 @@ Let's create a new file called `Counter.kt`. This will contain our composable fu
 /**
  * A widget which reacts to the provided [CounterCubit] and notifies it in response to user input.
  */
-@FlowPreview
+
 @Composable
 fun Counter(
-    cubit: CounterCubit = remember { CounterCubit() },
+  scope = rememberCoroutineScope(),
+  cubit: CounterCubit = remember { CounterCubit() },
 ) {
     Scaffold(
         topBar = {
@@ -101,7 +102,9 @@ fun Counter(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { cubit.increment() }
+                onClick = { 
+                  scope.launch { cubit.increment() } 
+                },
             ) {
                 Icon(Icons.Default.Add, "Increment")
             }
@@ -119,7 +122,7 @@ fun Counter(
 }
 
 @Preview
-@FlowPreview
+
 @Composable
 fun CounterPreview() {
     Counter()
@@ -135,7 +138,7 @@ A `BlocComposer` is used to wrap the `Text` widget, in order to update the text 
 Let's go back to our `MainActivity` class, and remove all the example code. Then, within your theme composable, add the `Counter` widget.
 
 ```kotlin
-@FlowPreview
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,7 +161,7 @@ class MainActivity : ComponentActivity() {
 We can write a set of simple unit tests to verify the behavior of the `CounterCubit`. Create a new `CounterCubitTest.kt` file in the `test` source set, with the following contents:
 
 ```kotlin
-@FlowPreview
+
 class CounterCubitTest {
     @Test
     fun initialState() {
@@ -192,7 +195,7 @@ debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 Then, in the `androidTest` source set, create a `CounterTest.kt` file with the following contents:
 
 ```kotlin
-@FlowPreview
+
 class CounterTest {
     @get:Rule
     val rule = createComposeRule()
@@ -221,7 +224,7 @@ This test runs on a real device or emulator, and verifies that the Counter widge
 If we wanted to decouple our widget test from our `CounterCubit` implementation, we could use something like the [`mockk`](https://mockk.io) framework to create a fake version of `CounterCubit` for use in this test.
 
 ```kotlin
-@FlowPreview
+
 class CounterTest {
     @get:Rule
     val rule = createComposeRule()

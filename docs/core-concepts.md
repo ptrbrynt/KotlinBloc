@@ -2,42 +2,6 @@
 
 ?> The concepts and classes described on this page apply to the `core` and `compose` libraries, and can be used in any Kotlin application.
 
-## Kotlin Flow
-
-?> Check out the [official Flow documentation](https://kotlinlang.org/docs/flow.html) for more information about Flow.
-
-> A Flow is a stream of asynchronously computed values.
-
-In order to use the bloc library, it's critical to have a basic understanding of how Kotlin Flow works.
-
-> If you're unfamiliar with Flow, just think of a flow as a pipe with water flowing through it. The pipe is the Flow, and the water is the asynchronous data.
-
-We can create a Flow in Kotlin using the flow builder syntax:
-
-```kotlin
-val countFlow(max: Int): Flow<Int> = flow {
-  for (i in 0..max) {
-    emit(i)
-  }
-}
-```
-
-By using the `flow` builder, we are able to use the `emit` keyword and return a `Flow` of data. In the above example, we are returning a `Flow` of integers up to the `max` integer parameter.
-
-Every time we `emit` in a `flow`, we are pushing that piece of data through the `Flow`.
-
-We can consume the above `Flow` in several ways. If we wanted to write a function to print each value emitted by a `Flow` to the console, it would look something like this:
-
-```kotlin
-suspend fun printFlow(flow: Flow<Int>) {
-  flow.collect {
-    println("$it")
-  }
-}
-```
-
-*Notice that this is a `suspend fun`, since the `collect` method we are using is also a `suspend fun`.*
-
 ## Cubit
 
 > A `Cubit` is a class which extends `BlocBase` and can be extended to manage any type of state.
@@ -77,7 +41,7 @@ val cubitB = CounterCubit(10) // State starts at 10
 
 ```kotlin
 class CounterCubit : Cubit<Int>(0) {
-  fun increment() = emit(state + 1)
+  suspend fun increment() = emit(state + 1)
 }
 ```
 
@@ -90,7 +54,7 @@ In the above snippet, the `CounterCubit` is exposing a public method called incr
 #### Basic Usage
 
 ```kotlin
-fun main() {
+suspend fun main() {
   val cubit = CounterCubit()
   println(cubit.state) // 0
   cubit.increment()
@@ -124,7 +88,7 @@ In the above snippet, we are `collect`ing the `CounterCubit`'s `stateFlow` and c
 
 ```kotlin
 class CounterCubit: Cubit<Int>(0) {
-  fun increment() = emit(state + 1)
+  suspend fun increment() = emit(state + 1)
   
   @override
   void onChange(change: Change<Int>) {
@@ -137,7 +101,7 @@ class CounterCubit: Cubit<Int>(0) {
 We can then interact with the `Cubit` and observe all changes printed to the console.
 
 ```kotlin
-fun main() {
+suspend fun main() {
   CounterCubit().apply {
     increment()
   }
@@ -176,13 +140,11 @@ Using `Bloc` requires us to override the `mapEventToState` method. This will be 
 enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
-  override fun mapEventToState(event: CounterEvent): Flow<Int> = flow {
+  override suspend fun mapEventToState(event: CounterEvent) {
     
   }
 }
 ```
-
-> **Tip**: Notice we're using the `flow` builder syntax.
 
 We can then update `mapEventToState` to handle the `CounterEvent.Incremented` event:
 
@@ -190,7 +152,7 @@ We can then update `mapEventToState` to handle the `CounterEvent.Incremented` ev
 enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
-  override fun mapEventToState(event: CounterEvent): Flow<Int> = flow {
+  override suspend fun mapEventToState(event: CounterEvent) {
     when (event) {
       CounterEvent.Incremented -> emit(state + 1)
     }
@@ -199,10 +161,6 @@ class CounterBloc: Bloc<CounterEvent, Int>(0) {
 ```
 
 In the above snippet, we are using a `when` statement to check the type of `event` we're handling. If it's an `Incremented` event, we are `emit`ting a new state.
-
-> **Note**: The `emit` method we're calling here is the standard `emit` method provided by the `flow` builder syntax.
-
-!> `Bloc`s can't directly `emit` new states. Instead, every state change must take place in response to an incoming event as part of the `mapEventToState` method.
 
 ### Using a Bloc
 
@@ -250,17 +208,17 @@ class LoggingBlocObserver : BlocObserver() {
 
     override fun <B : BlocBase<State>, State> onCreate(bloc: B) {
         super.onCreate(bloc)
-        Log.i(bloc::class.qualifiedName, "Created")
+        Log.i(bloc::class.simpleName, "Created")
     }
 
     override fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {
         super.onChange(bloc, change)
-        Log.i(bloc::class.qualifiedName, change.toString())
+        Log.i(bloc::class.simpleName, change.toString())
     }
 
     override fun <B : Bloc<Event, State>, Event, State> onEvent(bloc: B, event: Event) {
         super.onEvent(bloc, event)
-        Log.i(bloc::class.qualifiedName, "Event: $event")
+        Log.i(bloc::class.simpleName, event.toString())
     }
 
     override fun <B : Bloc<Event, State>, Event, State> onTransition(
@@ -268,7 +226,7 @@ class LoggingBlocObserver : BlocObserver() {
         transition: Transition<Event, State>,
     ) {
         super.onTransition(bloc, transition)
-        Log.i(bloc::class.qualifiedName, transition.toString())
+        Log.i(bloc::class.simpleName, transition.toString())
     }
 }
 ```
@@ -305,7 +263,7 @@ Here's an example of a `CounterCubit`, and a `CounterBloc` with equivalent funct
 
 ```kotlin
 class CounterCubit : Cubit<Int>(0) {
-  fun increment = emit(state + 1)
+  suspend fun increment = emit(state + 1)
 }
 ```
 
@@ -315,7 +273,7 @@ class CounterCubit : Cubit<Int>(0) {
 enum class CounterEvent { Increment }
 
 class CounterBloc : Bloc<CounterEvent, Int>(0) {
-  override fun mapEventToState(event: CounterEvent) = flow {
+  override suspend fun mapEventToState(event: CounterEvent) {
     when (event) {
       is CounterEvent.Increment -> emit(state + 1)
     }
@@ -323,7 +281,7 @@ class CounterBloc : Bloc<CounterEvent, Int>(0) {
 }
 ```
 
-The `Cubit` implementation is much more concise, and instead of defining events separately the methods act like events. In addition, when using a `Cubit`, we don't have to use the `flow` builder syntax or even understand how it works; we simply call `emit` from anywhere in order to trigger a state change.
+The `Cubit` implementation is much more concise, and instead of defining events separately the methods act like events.
 
 ### Bloc Advantages
 
@@ -362,28 +320,15 @@ This tells us the user was logged out, but doesn't explain why that happened.
 
 Another area in which `Bloc` excels over `Cubit` is when we need to take advantage of reactive operators such as `debounce` and `filter`. 
 
-`Bloc` has an event skink which allows us to control and transform the incoming flow of events.
+`Bloc` has an event sink which allows us to control and transform the incoming flow of events.
 
 For example, if we were building real-time search, we would probably want to debounce the requests to the backend in order to avoid getting rate-limited, as well as to cut down on network requests.
 
 With `Bloc`, we can override the `transformEvents` method to change the way incoming events are processed by the `Bloc`.
 
 ```kotlin
-override fun transformEvents(
-  events: Flow<CounterEvent>,
-  transitionFn: (CounterEvent) -> Flow<Transition<CounterEvent, Int>>,
-): Flow<Transition<CounterEvent, Int>> {
-  return super.transformEvents(events.debounce(1000), transitionFn)
-}
-```
-
-Additionally, `Bloc` provides a `transformTransitions` function which can be overridden to control and transform the outgoing flow of transitions:
-
-```kotlin
-override fun transformTransitions(
-  transitions: Flow<Transition<CounterEvent, Int>>,
-): Flow<Transition<CounterEvent, Int>> {
-  return transitions.filter { it.newState % 2 == 0 } // Only emit states with even numbers
+override fun Flow<CounterEvent>.transformEvents(): Flow<CounterEvent> {
+  return onEach { delay(2000) }
 }
 ```
 

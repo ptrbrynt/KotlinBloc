@@ -3,13 +3,11 @@ package com.ptrbrynt.kotlin_bloc.core
 import app.cash.turbine.test
 import com.ptrbrynt.kotlin_bloc.core.cubits.CounterCubit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
 
-@FlowPreview
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 internal class CubitTest {

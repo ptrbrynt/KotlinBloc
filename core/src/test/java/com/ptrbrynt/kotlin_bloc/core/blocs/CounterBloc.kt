@@ -2,13 +2,11 @@ package com.ptrbrynt.kotlin_bloc.core.blocs
 
 import com.ptrbrynt.kotlin_bloc.core.Bloc
 import com.ptrbrynt.kotlin_bloc.core.Transition
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 
 enum class CounterEvent { Increment, Decrement }
 
-@FlowPreview
 open class CounterBloc(
     private val onTransitionCallback: ((Transition<CounterEvent, Int>) -> Unit)? = null,
     private val onEventCallback: ((CounterEvent) -> Unit)? = null,
@@ -31,7 +29,6 @@ open class CounterBloc(
     }
 }
 
-@FlowPreview
 class IncrementOnlyCounterBloc : CounterBloc() {
     override fun Flow<CounterEvent>.transformEvents(): Flow<CounterEvent> {
         return filter { it == CounterEvent.Increment }

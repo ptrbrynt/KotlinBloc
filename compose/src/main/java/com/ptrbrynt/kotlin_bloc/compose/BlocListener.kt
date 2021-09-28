@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -42,7 +41,7 @@ import kotlinx.coroutines.flow.Flow
  * @param transformStates Provides more granular control over the [State] flow.
  * @see BlocComposer
  */
-@FlowPreview
+
 @Composable
 fun <B : BlocBase<State>, State> BlocListener(
     bloc: B,

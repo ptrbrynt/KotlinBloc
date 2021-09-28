@@ -9,12 +9,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ptrbrynt.kotlin_bloc.compose.blocs.CounterBloc
 import com.ptrbrynt.kotlin_bloc.compose.blocs.CounterEvent
-import kotlinx.coroutines.FlowPreview
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@FlowPreview
 @RunWith(AndroidJUnit4::class)
 class BlocSelectorTest {
 

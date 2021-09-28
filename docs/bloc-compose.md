@@ -17,15 +17,15 @@ BlocComposer(bloc) { state ->
 }
 ```
 
-For fine-grained control over when the `content` function is re-composed, you can add a `composeWhen`. This takes the new state and returns a boolean. If `composeWhen` returns true, the `content` will be updated with the new state. If `composeWhen` returns false, the `content` will not receive the new state.
+For fine-grained control over when the `content` function is re-composed, you can add a `transformStates`. This allows you to transform the flow of states emitted by the `bloc`. For example, you could filter out certain states, or debounce the flow to prevent state changes from happening too quickly.
 
 ```kotlin
 val bloc = remember { CounterBloc() }
 
 BlocComposer(
   bloc,
-  // Only compose for even numbers
-  composeWhen = { state -> state % 2 == 0 },
+  // Only compose for even numbers, at most once per second
+  transformStates = { this.filter { it % 2 == 0 }.debounce(1000) },
 ) { state ->
   // Compose views here based on the current state
 }
@@ -45,15 +45,15 @@ BlocListener(bloc) { state ->
 }
 ```
 
-For fine-grained control over when the `onState` callback is invoked, an optional `reactWhen` can be provided. This takes the new state and returns a boolean. If `reactWhen` returns true, `onState` will be invoked with the new state. If `reactWhen` returns false, the new state will be ignored.
+For fine-grained control over when the `onState` callback is invoked, you can add a `transformStates`. This allows you to transform the flow of states emitted by the `bloc`. For example, you could filter out certain states, or debounce the flow to prevent state changes from happening too quickly.
 
 ```kotlin
 val bloc = remember { CounterBloc() }
 
 BlocListener(
   bloc,
-  // Only react to even numbers
-  reactWhen = { state -> state % 2 == 0 },
+  // Only react to even numbers, at most once per second
+  transformStates = { this.filter { it % 2 == 0 }.debounce(1000) },
 ) { state -> 
   // Do something here based on the bloc state
 }
@@ -69,7 +69,7 @@ Let's take a look at how to use `BlocComposer` to hook up a `Counter` widget to 
 enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
-  override fun mapEventToState(event: CounterEvent) = flow {
+  override suspend fun mapEventToState(event: CounterEvent) {
     when (event) {
       is CounterEvent.Incremented -> emit(state + 1)
     }

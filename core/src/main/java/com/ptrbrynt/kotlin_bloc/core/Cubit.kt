@@ -1,7 +1,5 @@
 package com.ptrbrynt.kotlin_bloc.core
 
-import kotlinx.coroutines.FlowPreview
-
 /**
  * A [Cubit] is similar to a [Bloc] but has no notion of events,
  * instead relying on methods to [emit] [State]s.
@@ -19,5 +17,5 @@ import kotlinx.coroutines.FlowPreview
  * @param initial The initial [State]
  * @see Bloc
  */
-@FlowPreview
+
 abstract class Cubit<State>(initial: State) : BlocBase<State>(initial)

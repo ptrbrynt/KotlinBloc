@@ -6,12 +6,11 @@ import com.ptrbrynt.kotlin_bloc.core.BlocBase
 import com.ptrbrynt.kotlin_bloc.core.BlocObserver
 import com.ptrbrynt.kotlin_bloc.core.Change
 import com.ptrbrynt.kotlin_bloc.core.Transition
-import kotlinx.coroutines.FlowPreview
 
 /**
  * A [BlocObserver] which logs all bloc events to the console.
  */
-@FlowPreview
+
 class LoggingBlocObserver : BlocObserver() {
 
     override fun <B : BlocBase<State>, State> onCreate(bloc: B) {

@@ -1,6 +1,5 @@
 package com.ptrbrynt.kotlin_bloc.core
 
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.launchIn
@@ -15,7 +14,6 @@ import kotlinx.coroutines.launch
  * @param initial The initial [State]
  * @see Cubit
  */
-@FlowPreview
 @Suppress("LeakingThis")
 abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
     private val eventFlow = MutableSharedFlow<Event>()

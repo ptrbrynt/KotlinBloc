@@ -12,7 +12,6 @@ import com.ptrbrynt.kotlin_bloc.core.blocs.SeededBloc
 import io.mockk.mockk
 import io.mockk.verifyOrder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.system.measureTimeMillis
@@ -22,7 +21,6 @@ import kotlin.test.assertTrue
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-@FlowPreview
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 internal class BlocTest {

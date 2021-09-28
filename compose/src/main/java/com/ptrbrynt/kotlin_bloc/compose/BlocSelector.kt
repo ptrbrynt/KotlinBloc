@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.map
 
 /**
@@ -26,7 +25,7 @@ import kotlinx.coroutines.flow.map
  * @param selector A function invoked on each new bloc [State], responsible for returning a new value of [T] based on the incoming [State].
  * @param content The composable which will be composed on each [bloc] [State] change, based on the value returned by [selector].
  */
-@FlowPreview
+
 @Composable
 fun <B : BlocBase<State>, State, T> BlocSelector(
     bloc: B,

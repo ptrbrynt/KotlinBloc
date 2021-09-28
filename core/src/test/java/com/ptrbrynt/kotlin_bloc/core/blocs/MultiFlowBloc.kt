@@ -2,7 +2,6 @@ package com.ptrbrynt.kotlin_bloc.core.blocs
 
 import com.ptrbrynt.kotlin_bloc.core.Bloc
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -14,7 +13,7 @@ object MultiFlowInitialized : MultiFlowEvent()
 data class MultiFlowNumberAdded(val number: Int) : MultiFlowEvent()
 
 @ExperimentalCoroutinesApi
-@FlowPreview
+
 class MultiFlowBloc : Bloc<MultiFlowEvent, List<Int>>(emptyList()) {
     private val numbers = MutableStateFlow(emptyList<Int>())
 
