@@ -6,6 +6,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
@@ -21,20 +22,26 @@ abstract class BlocBase<State>(initial: State) {
         Bloc.observer.onCreate(this)
     }
 
-    protected val scope = CoroutineScope(Dispatchers.Unconfined)
+    protected val blocScope = CoroutineScope(Dispatchers.Unconfined)
 
-    protected val mutableStateFlow = MutableSharedFlow<State>().apply {
-        scope.launch {
-            collect { newState ->
-                onChange(Change(state, newState))
+    protected val mutableChangeFlow = MutableSharedFlow<Change<State>>()
+        .apply {
+            blocScope.launch {
+                collect { onChange(it) }
             }
         }
-    }
 
     /**
      * The current [State] [Flow]
      */
-    val stateFlow: Flow<State> = mutableStateFlow
+    val stateFlow = mutableChangeFlow.map { it.newState }
+
+    /**
+     * Causes this to emit a new [state].
+     */
+    protected suspend fun emit(state: State) {
+        mutableChangeFlow.emit(Change(this@BlocBase.state, state))
+    }
 
     /**
      * The current [State]

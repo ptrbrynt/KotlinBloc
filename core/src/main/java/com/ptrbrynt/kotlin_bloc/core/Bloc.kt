@@ -3,11 +3,9 @@ package com.ptrbrynt.kotlin_bloc.core
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 
 /**
@@ -18,23 +16,21 @@ import kotlinx.coroutines.launch
  * @see Cubit
  */
 @FlowPreview
+@Suppress("LeakingThis")
 abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
     private val eventFlow = MutableSharedFlow<Event>()
 
-    init {
-        scope.launch {
-            transformTransitions(
-                transformEvents(
-                    eventFlow.onEach { onEvent(it) },
-                ) { event ->
-                    mapEventToState(event)
-                        .map { newState -> Transition(state, event, newState) }
-                        .onEach { onTransition(it) }
-                }
-            ).collect {
-                mutableStateFlow.emit(it.newState)
-            }
+    private val transitionFlow = eventFlow
+        .onEach { onEvent(it) }
+        .transformEvents()
+        .onEach { mapEventToState(it) }
+        .zip(mutableChangeFlow) { event, change ->
+            Transition(change.state, event, change.newState)
         }
+        .onEach { onTransition(it) }
+
+    init {
+        transitionFlow.launchIn(blocScope)
     }
 
     /**
@@ -46,12 +42,12 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
      *
      * [mapEventToState] can emit zero, one, or multiple [State]s for each [event].
      */
-    abstract fun mapEventToState(event: Event): Flow<State>
+    abstract suspend fun mapEventToState(event: Event)
 
     /**
      * Notifies the [Bloc] of a new [event], which triggers [mapEventToState].
      */
-    fun add(event: Event) = scope.launch {
+    fun add(event: Event) = blocScope.launch {
         eventFlow.emit(event)
     }
 
@@ -97,63 +93,20 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
     }
 
     /**
-     * Transforms the [Flow] of [Transition]s into a new [Flow] of [Transition]s.
+     * Transforms the incoming [Flow] of [Event]s into a new [Flow] of [Event]s.
      *
-     * By default, [transformTransitions] returns the incoming [transitions] [Flow].
+     * By default, [transformEvents] returns the incoming [Event] [Flow] unchanged.
      *
-     * You can override [transformTransitions] for advanced usage in order to
-     * manipulate the frequency and specificity at which `transitions` may occur.
+     * You can override [transformEvents] for advanced usage in order to manipulate the
+     * frequency and specificity at which events are passed to [mapEventToState].
      *
-     * For example, to debounce ongoing state changes:
+     * For example, to debounce incoming events:
      *
      * ```kotlin
-     * override fun transformTransitions(transitions: Flow<Transition<Event, State>>): Flow<Transition<Event, State>> {
-     *   return transitions.debounce(100)
-     * }
+     * override fun Flow<Event>transformEvents() = this.debounce(100)
      * ```
      */
-    protected open fun transformTransitions(
-        transitions: Flow<Transition<Event, State>>,
-    ) = transitions
-
-    /**
-     * Transforms the [events] flow along with a [transitionFn] function into
-     * a [Flow] of [Transition]s.
-     *
-     * Events that should be processed by [mapEventToState] must be passed into
-     * [transitionFn].
-     *
-     * By default [flatMapConcat] is used to ensure all [events] are processed
-     * in the order in which they are received.
-     *
-     * You can override [transformEvents] for advanced usage in order to manipulate
-     * the frequency and specificity with which [mapEventToState] is called, as
-     * well as which [events] are processed.
-     *
-     * For example, if you only want [mapEventToState] to be called on the most recent
-     * [Event], you can use [flatMapLatest] instead of [flatMapConcat]:
-     *
-     * ```kotlin
-     * override fun transformEvents(
-     *   events: Flow<Event>,
-     *   transitionFn: (Event) -> Flow<Transition<Event, State>>,
-     * ) = events.flatMapLatest { transitionFn(it) }
-     * ```
-     *
-     * Alternatively, if you only want [mapEventToState] to be called for distinct
-     * [events]:
-     *
-     * ```kotlin
-     * override fun transformEvents(
-     *   events: Flow<Event>,
-     *   transitionFn: (Event) -> Flow<Transition<Event, State>>,
-     * ) = super.transformEvents(events.distinctUntilChanged(), transitionFn)
-     * ```
-     */
-    protected open fun transformEvents(
-        events: Flow<Event>,
-        transitionFn: (Event) -> Flow<Transition<Event, State>>,
-    ) = events.flatMapConcat { transitionFn(it) }
+    protected open fun Flow<Event>.transformEvents() = this
 
     companion object {
         var observer: BlocObserver = SilentBlocObserver()

@@ -6,7 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Takes a [bloc] and an [onState] callback and invokes [onState] in response to `state` changes
@@ -23,24 +23,33 @@ import kotlinx.coroutines.flow.filter
  * }
  * ```
  *
- * An optional [reactWhen] can be implemented for more granular control over when [onState] is
- * called.
- * [reactWhen] will be invoked on every [bloc] state change.
- * [reactWhen] is optional and, when omitted, will default to `true`.
+ * * An optional [transformStates] can be implemented for more granular control over
+ * the frequency and specificity with which transitions occur.
+ *
+ * For example, to debounce the state changes:
+ *
+ * ```kotlin
+ * BlocListener(
+ *   myBloc,
+ *   transformStates = { this.debounce(1000) },
+ * ) {
+ *   // React to the new state here
+ * }
+ * ```
  *
  * @param bloc The bloc or cubit that the [BlocListener] will interact with.
  * @param onState The callback function which will be invoked whenever a new `state` is emitted by the [bloc].
- * @param reactWhen Provides more granular control over when [onState] is invoked.
+ * @param transformStates Provides more granular control over the [State] flow.
  * @see BlocComposer
  */
 @FlowPreview
 @Composable
 fun <B : BlocBase<State>, State> BlocListener(
     bloc: B,
-    reactWhen: (State) -> Boolean = { true },
+    transformStates: Flow<State>.() -> Flow<State> = { this },
     onState: suspend (State) -> Unit,
 ) {
-    val state by bloc.stateFlow.filter { reactWhen(it) }.collectAsState(initial = null)
+    val state by bloc.stateFlow.transformStates().collectAsState(initial = null)
 
     state?.let {
         LaunchedEffect(it) {

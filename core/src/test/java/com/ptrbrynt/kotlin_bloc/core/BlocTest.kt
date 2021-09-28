@@ -5,6 +5,9 @@ import com.ptrbrynt.kotlin_bloc.core.blocs.CounterBloc
 import com.ptrbrynt.kotlin_bloc.core.blocs.CounterEvent
 import com.ptrbrynt.kotlin_bloc.core.blocs.DebounceBloc
 import com.ptrbrynt.kotlin_bloc.core.blocs.IncrementOnlyCounterBloc
+import com.ptrbrynt.kotlin_bloc.core.blocs.MultiFlowBloc
+import com.ptrbrynt.kotlin_bloc.core.blocs.MultiFlowInitialized
+import com.ptrbrynt.kotlin_bloc.core.blocs.MultiFlowNumberAdded
 import com.ptrbrynt.kotlin_bloc.core.blocs.SeededBloc
 import io.mockk.mockk
 import io.mockk.verifyOrder
@@ -39,12 +42,12 @@ internal class BlocTest {
 
             observer.onEvent(bloc, CounterEvent.Increment)
 
+            observer.onChange(bloc, Change(0, 1))
+
             observer.onTransition(
                 bloc,
                 Transition(0, CounterEvent.Increment, 1)
             )
-
-            observer.onChange(bloc, Change(0, 1))
         }
     }
 
@@ -170,6 +173,22 @@ internal class BlocTest {
             bloc.add(CounterEvent.Increment)
 
             assertEquals(2, awaitItem())
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `MultiFlowBloc still receives events after initialize`() = runBlocking {
+        val bloc = MultiFlowBloc()
+
+        bloc.stateFlow.test {
+            bloc.add(MultiFlowInitialized)
+
+            assertEquals(emptyList(), awaitItem())
+
+            bloc.add(MultiFlowNumberAdded(1))
+
+            assertEquals(listOf(1), awaitItem())
         }
     }
 }

@@ -5,7 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.Flow
 
 /**
  * [BlocComposer] handles re-composition of its [content] in response to new [State]s.
@@ -14,29 +14,40 @@ import kotlinx.coroutines.flow.filter
  * e.g. display a Snackbar.
  *
  * ```kotlin
- * BlocBuilder(myBloc) { state ->
+ * BlocComposer(myBloc) { state ->
  *   // Add your composables here
  * }
  * ```
  *
- * An optional [composeWhen] can be implemented for more granular control over
- * how often [BlocComposer] re-composes.
- * [composeWhen] will be invoked whenever the [bloc] state changes.
- * [composeWhen] is optional and, when omitted, will default to `true`.
+ * An optional [transformStates] can be implemented for more granular control over
+ * the frequency and specificity with which transitions occur.
+ *
+ * For example, to debounce the state changes:
+ *
+ * ```kotlin
+ * BlocComposer(
+ *   myBloc,
+ *   transformStates = { this.debounce(1000) },
+ * ) {
+ *   // Your content goes here
+ * }
+ * ```
  *
  * @param bloc The bloc or cubit that the [BlocComposer] will interact with.
  * @param content The composable function which is re-composed on each new [bloc] state.
- * @param composeWhen Provides more granular control over how often [BlocComposer] re-composes.
+ * @param transformStates Provides more granular control over the [State] flow.
  * @see BlocListener
  */
 @FlowPreview
 @Composable
 fun <B : BlocBase<State>, State> BlocComposer(
     bloc: B,
-    composeWhen: (State) -> Boolean = { true },
+    transformStates: Flow<State>.() -> Flow<State> = { this },
     content: @Composable (State) -> Unit,
 ) {
-    val state by bloc.stateFlow.filter { composeWhen(it) }.collectAsState(initial = bloc.state)
+    val state by bloc.stateFlow
+        .transformStates()
+        .collectAsState(initial = bloc.state)
 
     content(state)
 }

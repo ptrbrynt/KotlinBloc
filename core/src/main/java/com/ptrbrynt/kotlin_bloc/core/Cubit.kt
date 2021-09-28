@@ -1,7 +1,6 @@
 package com.ptrbrynt.kotlin_bloc.core
 
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.launch
 
 /**
  * A [Cubit] is similar to a [Bloc] but has no notion of events,
@@ -21,11 +20,4 @@ import kotlinx.coroutines.launch
  * @see Bloc
  */
 @FlowPreview
-abstract class Cubit<State>(initial: State) : BlocBase<State>(initial) {
-    /**
-     * Causes the [Cubit] to emit a new [state].
-     */
-    protected fun emit(state: State) = scope.launch {
-        mutableStateFlow.emit(state)
-    }
-}
+abstract class Cubit<State>(initial: State) : BlocBase<State>(initial)

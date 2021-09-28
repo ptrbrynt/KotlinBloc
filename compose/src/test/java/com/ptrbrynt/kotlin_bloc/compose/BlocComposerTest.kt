@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ptrbrynt.kotlin_bloc.compose.blocs.CounterBloc
 import com.ptrbrynt.kotlin_bloc.compose.blocs.CounterEvent
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.filter
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,5 +41,33 @@ class BlocComposerTest {
         bloc.add(CounterEvent.Increment)
 
         composableTestRule.onNodeWithText("1").assertIsDisplayed()
+    }
+
+    @Test
+    fun blocComposerTransformTest() {
+        val bloc = CounterBloc()
+
+        composableTestRule.setContent {
+            MaterialTheme {
+                Scaffold {
+                    BlocComposer(
+                        bloc,
+                        transformStates = { filter { it % 2 == 0 } }
+                    ) {
+                        Text("$it")
+                    }
+                }
+            }
+        }
+
+        composableTestRule.onNodeWithText("0").assertIsDisplayed()
+
+        bloc.add(CounterEvent.Increment)
+
+        composableTestRule.onNodeWithText("0").assertIsDisplayed()
+
+        bloc.add(CounterEvent.Increment)
+
+        composableTestRule.onNodeWithText("2").assertIsDisplayed()
     }
 }
