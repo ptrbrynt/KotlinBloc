@@ -35,13 +35,6 @@ abstract class BlocBase<State>(initial: State) {
     val stateFlow = mutableChangeFlow.map { it.newState }
 
     /**
-     * Causes this to emit a new [state].
-     */
-    protected suspend fun emit(state: State) {
-        mutableChangeFlow.emit(Change(this@BlocBase.state, state))
-    }
-
-    /**
      * The current [State]
      */
     var state: State = initial

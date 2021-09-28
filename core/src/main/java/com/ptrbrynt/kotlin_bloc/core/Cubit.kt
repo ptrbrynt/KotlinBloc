@@ -1,5 +1,9 @@
 package com.ptrbrynt.kotlin_bloc.core
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+
 /**
  * A [Cubit] is similar to a [Bloc] but has no notion of events,
  * instead relying on methods to [emit] [State]s.
@@ -18,4 +22,12 @@ package com.ptrbrynt.kotlin_bloc.core
  * @see Bloc
  */
 
-abstract class Cubit<State>(initial: State) : BlocBase<State>(initial)
+abstract class Cubit<State>(initial: State) : BlocBase<State>(initial), Emitter<State> {
+    override suspend fun emit(state: State) {
+        mutableChangeFlow.emit(Change(this.state, state))
+    }
+
+    override suspend fun emitEach(states: Flow<State>) {
+        states.onEach { emit(it) }.launchIn(blocScope)
+    }
+}

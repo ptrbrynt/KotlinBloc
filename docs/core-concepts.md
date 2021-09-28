@@ -140,11 +140,13 @@ Using `Bloc` requires us to override the `mapEventToState` method. This will be 
 enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
-  override suspend fun mapEventToState(event: CounterEvent) {
+  override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
     
   }
 }
 ```
+
+?> The `mapEventToState` method receives an `Emitter`, which provides the `emit` and `emitEach` methods we'll use below. This means that, while a `Cubit` can `emit` from anywhere, a `Bloc` can only `emit` from within the `mapEventToState` method.
 
 We can then update `mapEventToState` to handle the `CounterEvent.Incremented` event:
 
@@ -152,7 +154,7 @@ We can then update `mapEventToState` to handle the `CounterEvent.Incremented` ev
 enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
-  override suspend fun mapEventToState(event: CounterEvent) {
+  override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
     when (event) {
       CounterEvent.Incremented -> emit(state + 1)
     }
@@ -273,7 +275,7 @@ class CounterCubit : Cubit<Int>(0) {
 enum class CounterEvent { Increment }
 
 class CounterBloc : Bloc<CounterEvent, Int>(0) {
-  override suspend fun mapEventToState(event: CounterEvent) {
+  override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
     when (event) {
       is CounterEvent.Increment -> emit(state + 1)
     }

@@ -1,10 +1,9 @@
 package com.ptrbrynt.kotlin_bloc.core.blocs
 
 import com.ptrbrynt.kotlin_bloc.core.Bloc
+import com.ptrbrynt.kotlin_bloc.core.Emitter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 sealed class MultiFlowEvent
 
@@ -17,9 +16,9 @@ data class MultiFlowNumberAdded(val number: Int) : MultiFlowEvent()
 class MultiFlowBloc : Bloc<MultiFlowEvent, List<Int>>(emptyList()) {
     private val numbers = MutableStateFlow(emptyList<Int>())
 
-    override suspend fun mapEventToState(event: MultiFlowEvent) {
+    override suspend fun Emitter<List<Int>>.mapEventToState(event: MultiFlowEvent) {
         when (event) {
-            is MultiFlowInitialized -> numbers.onEach { emit(it) }.launchIn(blocScope)
+            is MultiFlowInitialized -> emitEach(numbers)
             is MultiFlowNumberAdded -> {
                 numbers.tryEmit(numbers.value + event.number)
             }

@@ -1,6 +1,7 @@
 package com.ptrbrynt.kotlin_bloc.core.blocs
 
 import com.ptrbrynt.kotlin_bloc.core.Bloc
+import com.ptrbrynt.kotlin_bloc.core.Emitter
 import com.ptrbrynt.kotlin_bloc.core.Transition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -11,7 +12,7 @@ open class CounterBloc(
     private val onTransitionCallback: ((Transition<CounterEvent, Int>) -> Unit)? = null,
     private val onEventCallback: ((CounterEvent) -> Unit)? = null,
 ) : Bloc<CounterEvent, Int>(0) {
-    override suspend fun mapEventToState(event: CounterEvent) {
+    override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
         when (event) {
             CounterEvent.Increment -> emit(state + 1)
             CounterEvent.Decrement -> emit(state - 1)

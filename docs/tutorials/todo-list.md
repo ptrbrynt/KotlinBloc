@@ -148,12 +148,12 @@ Now we have our events and states, we can create our `TodosBloc` class:
 
 ```kotlin
 class TodosBloc(private val todoDao: TodoDao) : Bloc<TodosEvent, TodosState>(TodosLoading) {
-    override suspend fun mapEventToState(event: TodosEvent) {
+    override suspend fun Emitter<TodosState>.mapEventToState(event: TodosEvent) {
         when (event) {
             is TodosInitialized -> {
-                todoDao.getAllTodos()
-                    .onEach { emit(TodosLoadSuccess(it)) }
-                    .launchIn(blocScope)
+                emitEach(
+                  todoDao.getAllTodos().map { TodosLoadSuccess(it) },
+                )
             }
             is TodoAdded -> {
                 todoDao.addTodo(Todo(name = event.name))
@@ -177,9 +177,9 @@ class TodosBloc(private val todoDao: TodoDao) : Bloc<TodosEvent, TodosState>(Tod
 
 Let's briefly talk through how this works.
 
-1. When the `TodosInitialized` event is added, the `TodosBloc` will get a `Flow` containing the current `List<Todo>` from our DAO using the `getAllTodos()` method. Room has built-in support for [observable queries](https://developer.android.com/training/data-storage/room/async-queries#flow-coroutines) using Flow.
-2. We are then adding an `onEach` call to this Flow, which `emit`s the current value provided by `getAllTodos()`. We then launch this flow using the `launchIn` method, and pass in the `blocScope` which is provided by the Bloc library.
-3. For all other events, we are simply calling the relevant DAO method. Thanks to Room's observable query, we don't need to manually retrieve and emit the new list of Todos, as this will be handled by the observable query we set up in steps 1 and 2.
+1. When the `TodosInitialized` event is added, the `TodosBloc` gets a `Flow` of the current list of `Todo`s using the `getAllTodos()` method on the DAO. It then `map`s this flow into `TodosLoadSuccess` states containing the current value.
+2. This flow of states is then passed into the `emitEach` method, which provided by the `Emitter` receiver. This will listen to the provided flow and emit each value.
+3. For all other events, we are simply calling the relevant DAO method. Thanks to Room's observable query, we don't need to manually retrieve and emit the new list of Todos, as this will be handled by the `emitEach` call we set up in steps 1 and 2.
 
 ## Koin Module
 

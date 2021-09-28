@@ -21,11 +21,21 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
     private val transitionFlow = eventFlow
         .onEach { onEvent(it) }
         .transformEvents()
-        .onEach { mapEventToState(it) }
+        .onEach { emitter.mapEventToState(it) }
         .zip(mutableChangeFlow) { event, change ->
             Transition(change.state, event, change.newState)
         }
         .onEach { onTransition(it) }
+
+    private val emitter = object : Emitter<State> {
+        override suspend fun emit(state: State) {
+            mutableChangeFlow.emit(Change(this@Bloc.state, state))
+        }
+
+        override suspend fun emitEach(states: Flow<State>) {
+            states.onEach { emit(it) }.launchIn(blocScope)
+        }
+    }
 
     init {
         transitionFlow.launchIn(blocScope)
@@ -39,8 +49,11 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
      * set of [State]s.
      *
      * [mapEventToState] can emit zero, one, or multiple [State]s for each [event].
+     *
+     * [mapEventToState] receives this [Bloc]s [Emitter], which allows [mapEventToState] to call
+     * the [Emitter.emit] method to trigger a state change.
      */
-    abstract suspend fun mapEventToState(event: Event)
+    abstract suspend fun Emitter<State>.mapEventToState(event: Event)
 
     /**
      * Notifies the [Bloc] of a new [event], which triggers [mapEventToState].
