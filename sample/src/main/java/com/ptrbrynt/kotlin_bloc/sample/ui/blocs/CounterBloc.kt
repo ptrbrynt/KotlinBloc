@@ -1,11 +1,9 @@
 package com.ptrbrynt.kotlin_bloc.sample.ui.blocs
 
 import com.ptrbrynt.kotlin_bloc.core.Bloc
-import kotlinx.coroutines.FlowPreview
 
 enum class CounterEvent { Increment, Decrement }
 
-@FlowPreview
 class CounterBloc : Bloc<CounterEvent, Int>(0) {
     override suspend fun mapEventToState(event: CounterEvent) {
         when (event) {

@@ -28,9 +28,7 @@ import com.ptrbrynt.kotlin_bloc.sample.ui.blocs.CounterBloc
 import com.ptrbrynt.kotlin_bloc.sample.ui.blocs.CounterEvent
 import com.ptrbrynt.kotlin_bloc.sample.ui.cubits.CounterCubit
 import com.ptrbrynt.kotlin_bloc.sample.ui.theme.KotlinBlocTheme
-import kotlinx.coroutines.FlowPreview
 
-@FlowPreview
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +44,7 @@ class MainActivity : ComponentActivity() {
  * Creates a Counter based on [CounterBloc]
  */
 @Composable
-@FlowPreview
+
 fun BlocCounter() {
     val bloc = remember { CounterBloc() }
     CounterBase(
@@ -61,7 +59,7 @@ fun BlocCounter() {
  * Creates a Counter based on [CounterCubit]
  */
 @Composable
-@FlowPreview
+
 fun CubitCounter() {
     val cubit = remember { CounterCubit() }
     CounterBase(
@@ -70,7 +68,6 @@ fun CubitCounter() {
     )
 }
 
-@FlowPreview
 @Composable
 fun CounterBase(
     bloc: BlocBase<Int>,
@@ -104,7 +101,7 @@ fun CounterBase(
 /**
  * Creates a Counter based on [CounterBloc], using [BlocSelector] to transform each state into a String to display.
  */
-@FlowPreview
+
 @Composable
 fun BlocSelectorCounter(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
@@ -142,7 +139,7 @@ fun BlocSelectorCounter(
 
 @Preview("BlocCounter")
 @Composable
-@FlowPreview
+
 fun BlocCounterPreview() {
     KotlinBlocTheme {
         BlocCounter()
@@ -151,7 +148,7 @@ fun BlocCounterPreview() {
 
 @Preview("CubitCounter")
 @Composable
-@FlowPreview
+
 fun CubitCounterPreview() {
     KotlinBlocTheme {
         CubitCounter()
@@ -160,7 +157,7 @@ fun CubitCounterPreview() {
 
 @Preview("BlocSelectorCounter")
 @Composable
-@FlowPreview
+
 fun BlocSelectorCounterPreview() {
     KotlinBlocTheme {
         BlocSelectorCounter()
