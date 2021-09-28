@@ -29,7 +29,7 @@ Finally, just add the following dependency to your module-level `build.gradle` f
 ```groovy
 dependencies {
   // ...
-	implementation 'com.github.ptrbrynt.KotlinBloc:compose:0.9'
+	implementation 'com.github.ptrbrynt.KotlinBloc:compose:0.11'
 }
 ```
 
