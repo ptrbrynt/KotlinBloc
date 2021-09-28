@@ -148,29 +148,25 @@ Now we have our events and states, we can create our `TodosBloc` class:
 
 ```kotlin
 class TodosBloc(private val todoDao: TodoDao) : Bloc<TodosEvent, TodosState>(TodosLoading) {
-    override suspend fun Emitter<TodosState>.mapEventToState(event: TodosEvent) {
-        when (event) {
-            is TodosInitialized -> {
-                emitEach(
-                  todoDao.getAllTodos().map { TodosLoadSuccess(it) },
-                )
-            }
-            is TodoAdded -> {
-                todoDao.addTodo(Todo(name = event.name))
-            }
-            is TodoCompleted -> {
-                val todo = todoDao.getTodo(event.id)
-                todoDao.updateTodo(todo.copy(completed = true))
-            }
-            is TodoUncompleted -> {
-                val todo = todoDao.getTodo(event.id)
-                todoDao.updateTodo(todo.copy(completed = false))
-            }
-            is TodoDeleted -> {
-                val todo = todoDao.getTodo(event.id)
-                todoDao.deleteTodo(todo)
-            }
-        }
+    init {
+      on<TodosInitialized> {
+        emitEach(todoDao.getAllTodos().map { TodosLoadSuccess(it) })
+      }
+      on<TodoAdded> {
+        todoDao.addTodo(Todo(name = event.name))
+      }
+      on<TodoCompleted> {
+        val todo = todoDao.getTodo(event.id)
+        todoDao.updateTodo(todo.copy(completed = true))
+      }
+      on<TodoUncompleted> {
+        val todo = todoDao.getTodo(event.id)
+        todoDao.updateTodo(todo.copy(completed = false))
+      }
+      on<TodoDeleted> {
+        val todo = todoDao.getTodo(event.id)
+        todoDao.deleteTodo(todo)
+      }
     }
 }
 ```

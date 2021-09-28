@@ -1,21 +1,27 @@
 package com.ptrbrynt.kotlin_bloc.core.blocs
 
 import com.ptrbrynt.kotlin_bloc.core.Bloc
-import com.ptrbrynt.kotlin_bloc.core.Emitter
 import com.ptrbrynt.kotlin_bloc.core.Transition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 
-enum class CounterEvent { Increment, Decrement }
+sealed class CounterEvent
+
+object Increment : CounterEvent()
+
+object Decrement : CounterEvent()
 
 open class CounterBloc(
     private val onTransitionCallback: ((Transition<CounterEvent, Int>) -> Unit)? = null,
     private val onEventCallback: ((CounterEvent) -> Unit)? = null,
 ) : Bloc<CounterEvent, Int>(0) {
-    override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
-        when (event) {
-            CounterEvent.Increment -> emit(state + 1)
-            CounterEvent.Decrement -> emit(state - 1)
+
+    init {
+        on<Increment> {
+            emit(state + 1)
+        }
+        on<Decrement> {
+            emit(state - 1)
         }
     }
 
@@ -32,6 +38,6 @@ open class CounterBloc(
 
 class IncrementOnlyCounterBloc : CounterBloc() {
     override fun Flow<CounterEvent>.transformEvents(): Flow<CounterEvent> {
-        return filter { it == CounterEvent.Increment }
+        return filter { it is Increment }
     }
 }

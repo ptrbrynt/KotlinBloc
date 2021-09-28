@@ -134,29 +134,17 @@ Just like when creating the `CounterCubit`, we must specify an initial state by 
 
 ### State Changes
 
-Using `Bloc` requires us to override the `mapEventToState` method. This will be responsible for converting any incoming events into zero or more outgoing states.
+We can then use `on<CounterEvent>` to handle the `CounterEvent.Incremented` event:
 
 ```kotlin
 enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
-  override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
-    
-  }
-}
-```
-
-?> The `mapEventToState` method receives an `Emitter`, which provides the `emit` and `emitEach` methods we'll use below. This means that, while a `Cubit` can `emit` from anywhere, a `Bloc` can only `emit` from within the `mapEventToState` method.
-
-We can then update `mapEventToState` to handle the `CounterEvent.Incremented` event:
-
-```kotlin
-enum class CounterEvent { Incremented }
-
-class CounterBloc: Bloc<CounterEvent, Int>(0) {
-  override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
-    when (event) {
-      CounterEvent.Incremented -> emit(state + 1)
+  init {
+    on<CounterEvent> {
+      when (event) {
+        CounterEvent.Incremented -> emit(state + 1)
+      }
     }
   }
 }
@@ -275,9 +263,11 @@ class CounterCubit : Cubit<Int>(0) {
 enum class CounterEvent { Increment }
 
 class CounterBloc : Bloc<CounterEvent, Int>(0) {
-  override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
-    when (event) {
-      is CounterEvent.Increment -> emit(state + 1)
+  init {
+    on<CounterEvent> {
+      when (event) {
+        is CounterEvent.Increment -> emit(state + 1)
+      }
     }
   }
 }

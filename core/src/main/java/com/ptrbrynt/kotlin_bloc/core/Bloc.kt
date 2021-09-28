@@ -2,6 +2,7 @@ package com.ptrbrynt.kotlin_bloc.core
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.zip
@@ -16,18 +17,20 @@ import kotlinx.coroutines.launch
  */
 @Suppress("LeakingThis")
 abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
-    private val eventFlow = MutableSharedFlow<Event>()
+    protected val eventFlow = MutableSharedFlow<Event>()
 
-    private val transitionFlow = eventFlow
-        .onEach { onEvent(it) }
-        .transformEvents()
-        .onEach { emitter.mapEventToState(it) }
-        .zip(mutableChangeFlow) { event, change ->
-            Transition(change.state, event, change.newState)
-        }
-        .onEach { onTransition(it) }
+    init {
+        eventFlow
+            .onEach { onEvent(it) }
+            .zip(mutableChangeFlow) { event, change ->
+                Transition(change.state, event, change.newState)
+            }
+            .onEach { onTransition(it) }
+            .launchIn(blocScope)
+    }
 
-    private val emitter = object : Emitter<State> {
+    @PublishedApi
+    internal val emitter = object : Emitter<State> {
         override suspend fun emit(state: State) {
             mutableChangeFlow.emit(Change(this@Bloc.state, state))
         }
@@ -37,29 +40,44 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
         }
     }
 
-    init {
-        transitionFlow.launchIn(blocScope)
+    /**
+     * Registers an event handler for events of type [E].
+     *
+     * There should only ever be one event handler per event type [E].
+     *
+     * ```kotlin
+     * sealed class CounterEvent
+     *
+     * object Increment: CounterEvent()
+     *
+     * class CounterBloc : Bloc<CounterEvent, Int> {
+     *   init {
+     *     on<Increment> { emit(state + 1) }
+     *   }
+     * }
+     * ```
+     *
+     * @param mapEventToState Function which responds to each event of the given type
+     * @since 0.13
+     * @param E The type of [Event] that this handles
+     */
+    protected inline fun <reified E : Event> on(
+        noinline mapEventToState: suspend Emitter<State>.(E) -> Unit,
+    ) {
+        eventFlow
+            .transformEvents()
+            .filterIsInstance<E>()
+            .onEach { emitter.mapEventToState(it) }
+            .launchIn(blocScope)
     }
 
     /**
-     * Must be implemented when a class extends [Bloc].
-     *
-     * [mapEventToState] is called whenever an [event] is [add]ed
-     * and is responsible for converting that [event] into a new
-     * set of [State]s.
-     *
-     * [mapEventToState] can emit zero, one, or multiple [State]s for each [event].
-     *
-     * [mapEventToState] receives this [Bloc]s [Emitter], which allows [mapEventToState] to call
-     * the [Emitter.emit] method to trigger a state change.
+     * Notifies the [Bloc] of a new [event], which triggers the event handler registered by [on].
      */
-    abstract suspend fun Emitter<State>.mapEventToState(event: Event)
-
-    /**
-     * Notifies the [Bloc] of a new [event], which triggers [mapEventToState].
-     */
-    fun add(event: Event) = blocScope.launch {
-        eventFlow.emit(event)
+    fun add(event: Event) {
+        blocScope.launch {
+            eventFlow.emit(event)
+        }
     }
 
     /**
@@ -109,7 +127,7 @@ abstract class Bloc<Event, State>(initial: State) : BlocBase<State>(initial) {
      * By default, [transformEvents] returns the incoming [Event] [Flow] unchanged.
      *
      * You can override [transformEvents] for advanced usage in order to manipulate the
-     * frequency and specificity at which events are passed to [mapEventToState].
+     * frequency and specificity at which events are passed into their event handlers.
      *
      * For example, to debounce incoming events:
      *

@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import com.ptrbrynt.kotlin_bloc.core.blocs.CounterBloc
 import com.ptrbrynt.kotlin_bloc.core.blocs.CounterEvent
 import com.ptrbrynt.kotlin_bloc.core.blocs.DebounceBloc
+import com.ptrbrynt.kotlin_bloc.core.blocs.Decrement
+import com.ptrbrynt.kotlin_bloc.core.blocs.Increment
 import com.ptrbrynt.kotlin_bloc.core.blocs.IncrementOnlyCounterBloc
 import com.ptrbrynt.kotlin_bloc.core.blocs.MultiFlowBloc
 import com.ptrbrynt.kotlin_bloc.core.blocs.MultiFlowInitialized
@@ -33,18 +35,18 @@ internal class BlocTest {
 
         val bloc = CounterBloc()
 
-        bloc.add(CounterEvent.Increment)
+        bloc.add(Increment)
 
         verifyOrder {
             observer.onCreate(bloc)
 
-            observer.onEvent(bloc, CounterEvent.Increment)
+            observer.onEvent(bloc, Increment)
 
             observer.onChange(bloc, Change(0, 1))
 
             observer.onTransition(
                 bloc,
-                Transition(0, CounterEvent.Increment, 1)
+                Transition(0, Increment, 1)
             )
         }
     }
@@ -61,15 +63,15 @@ internal class BlocTest {
         val bloc = CounterBloc()
 
         bloc.stateFlow.test {
-            bloc.add(CounterEvent.Increment)
+            bloc.add(Increment)
 
             assertEquals(1, awaitItem())
 
-            bloc.add(CounterEvent.Increment)
+            bloc.add(Increment)
 
             assertEquals(2, awaitItem())
 
-            bloc.add(CounterEvent.Decrement)
+            bloc.add(Decrement)
 
             assertEquals(1, awaitItem())
         }
@@ -84,26 +86,26 @@ internal class BlocTest {
             }
         )
 
-        bloc.add(CounterEvent.Increment)
-        bloc.add(CounterEvent.Decrement)
+        bloc.add(Increment)
+        bloc.add(Decrement)
 
-        assertContains(events, CounterEvent.Increment)
-        assertContains(events, CounterEvent.Decrement)
+        assertContains(events, Increment)
+        assertContains(events, Decrement)
     }
 
     @Test
     fun `CounterBloc state value stays up-to-date`() = runBlocking {
         val bloc = CounterBloc()
 
-        bloc.add(CounterEvent.Increment)
+        bloc.add(Increment)
 
         assertEquals(1, bloc.state)
 
-        bloc.add(CounterEvent.Increment)
+        bloc.add(Increment)
 
         assertEquals(2, bloc.state)
 
-        bloc.add(CounterEvent.Decrement)
+        bloc.add(Decrement)
 
         assertEquals(1, bloc.state)
     }
@@ -117,10 +119,10 @@ internal class BlocTest {
             }
         )
 
-        bloc.add(CounterEvent.Increment)
+        bloc.add(Increment)
 
         assertEquals(
-            Transition(0, CounterEvent.Increment, 1),
+            Transition<CounterEvent, Int>(0, Increment, 1),
             transition,
         )
     }
@@ -146,7 +148,7 @@ internal class BlocTest {
 
         bloc.stateFlow.test(Duration.seconds(2.5)) {
             val time = measureTimeMillis {
-                bloc.add(CounterEvent.Increment)
+                bloc.add(Increment)
 
                 assertEquals(1, awaitItem())
             }
@@ -160,15 +162,15 @@ internal class BlocTest {
         val bloc = IncrementOnlyCounterBloc()
 
         bloc.stateFlow.test {
-            bloc.add(CounterEvent.Increment)
+            bloc.add(Increment)
 
             assertEquals(1, awaitItem())
 
-            bloc.add(CounterEvent.Decrement)
+            bloc.add(Decrement)
 
             expectNoEvents()
 
-            bloc.add(CounterEvent.Increment)
+            bloc.add(Increment)
 
             assertEquals(2, awaitItem())
         }

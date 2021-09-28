@@ -36,8 +36,7 @@ abstract class BlocObserver {
     /**
      * Called whenever a [Transition] occurs in any [Bloc].
      *
-     * A [transition] occurs when a new `event` is `add`ed and `mapEventToState`
-     * is executed.
+     * A [transition] occurs when a new `event` is `add`ed and handled.
      *
      * [onTransition] is called before a [bloc]'s state has been updated.
      *

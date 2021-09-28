@@ -69,9 +69,11 @@ Let's take a look at how to use `BlocComposer` to hook up a `Counter` widget to 
 enum class CounterEvent { Incremented }
 
 class CounterBloc: Bloc<CounterEvent, Int>(0) {
-  override suspend fun Emitter<Int>.mapEventToState(event: CounterEvent) {
-    when (event) {
-      is CounterEvent.Incremented -> emit(state + 1)
+  init {
+    on<CounterEvent> { event ->
+      when (event) {
+	      CounterEvent.Incremented -> emit(state + 1)
+      }
     }
   }
 }
