@@ -31,7 +31,7 @@ Finally, just add the following dependencies to your module-level `build.gradle`
 ```groovy
 dependencies {
   // ...
-	implementation 'com.github.ptrbrynt.KotlinBloc:compose:0.11'
+	implementation 'com.github.ptrbrynt.KotlinBloc:compose:0.16'
   
   implementation "androidx.navigation:navigation-compose:2.4.0-alpha09"
   
