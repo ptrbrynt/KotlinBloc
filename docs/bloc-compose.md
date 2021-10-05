@@ -109,3 +109,45 @@ fun Counter() {
 ```
 
 At this point, we have successfully separated our presentation layer from our business logic layer. Notice that the `Counter` composable knows nothing about what happens when a user taps the buttons. The widget simply tells the `CounterBloc` that the user has pressed the Increment button.
+
+## Surviving process recreation
+
+The above examples use the `remember` method to persist the instance of `CounterBloc` through re-compositions. However, if the activity/process is recreated (e.g. by the screen being rotated), the `state` of the `CounterBloc` is lost and it reverts to its initial state.
+
+We can prevent this by using the `rememberSaveableBloc` method.
+
+There are a couple of prerequisites:
+
+1. Your `State` class must support being saved in a `Bundle`. In other words, it should be a primitive or a `Parcelable`.
+   * You can use the [`@Parcelize`](https://github.com/Kotlin/KEEP/blob/master/proposals/extensions/android-parcelable.md) annotation to easily make your state class parcelable
+2. Your Bloc must take its initial state as a constructor argument.
+
+So let's tweak our `CounterBloc` to support being saved:
+
+```kotlin
+enum class CounterEvent { Incremented }
+
+class CounterBloc(initial: Int): Bloc<CounterEvent, Int>(initial) {
+  init {
+    on<CounterEvent> { event ->
+      when (event) {
+	      CounterEvent.Incremented -> emit(state + 1)
+      }
+    }
+  }
+}
+```
+
+?> Since our state is an `Int`, it is already saveable in a `Bundle`.
+
+We can now use the `rememberSaveableBloc` method to persist the current `state` through configuration changes:
+
+```kotlin
+@Composable
+fun Counter() {
+  val bloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) }
+  
+  // Use the bloc as normal
+}
+```
+

@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.ptrbrynt.kotlin_bloc.compose.BlocComposer
 import com.ptrbrynt.kotlin_bloc.compose.BlocListener
 import com.ptrbrynt.kotlin_bloc.compose.BlocSelector
+import com.ptrbrynt.kotlin_bloc.compose.rememberSaveableBloc
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
 import com.ptrbrynt.kotlin_bloc.sample.ui.blocs.CounterBloc
 import com.ptrbrynt.kotlin_bloc.sample.ui.blocs.CounterEvent
@@ -44,9 +45,9 @@ class MainActivity : ComponentActivity() {
  * Creates a Counter based on [CounterBloc]
  */
 @Composable
-
 fun BlocCounter() {
-    val bloc = remember { CounterBloc() }
+    val bloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) }
+
     CounterBase(
         bloc,
         onIncrement = {
@@ -106,7 +107,7 @@ fun CounterBase(
 fun BlocSelectorCounter(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
-    val bloc = remember { CounterBloc() }
+    val bloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) }
 
     Scaffold(
         scaffoldState = scaffoldState,

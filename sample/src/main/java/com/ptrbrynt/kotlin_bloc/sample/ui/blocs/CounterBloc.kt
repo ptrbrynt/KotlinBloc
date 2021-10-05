@@ -4,7 +4,8 @@ import com.ptrbrynt.kotlin_bloc.core.Bloc
 
 enum class CounterEvent { Increment, Decrement }
 
-class CounterBloc : Bloc<CounterEvent, Int>(0) {
+class CounterBloc(initial: Int) : Bloc<CounterEvent, Int>(initial) {
+
     init {
         on<CounterEvent> { event ->
             when (event) {
