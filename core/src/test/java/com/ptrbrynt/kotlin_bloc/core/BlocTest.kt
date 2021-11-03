@@ -63,17 +63,13 @@ internal class BlocTest {
         val bloc = CounterBloc()
 
         bloc.stateFlow.test {
-            bloc.add(Increment)
+            listOf(Increment, Increment, Decrement).forEach {
+                bloc.add(it)
+            }
 
-            assertEquals(1, awaitItem())
-
-            bloc.add(Increment)
-
-            assertEquals(2, awaitItem())
-
-            bloc.add(Decrement)
-
-            assertEquals(1, awaitItem())
+            listOf(1, 2, 1).forEach {
+                assertEquals(it, awaitItem())
+            }
         }
     }
 

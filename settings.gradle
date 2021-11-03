@@ -10,3 +10,4 @@ rootProject.name = "KotlinBloc"
 include ':sample'
 include ':core'
 include ':compose'
+include ':test'

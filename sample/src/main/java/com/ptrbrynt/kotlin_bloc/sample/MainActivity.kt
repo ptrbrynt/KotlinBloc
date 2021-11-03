@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ptrbrynt.kotlin_bloc.compose.BlocComposer
-import com.ptrbrynt.kotlin_bloc.compose.BlocListener
 import com.ptrbrynt.kotlin_bloc.compose.BlocSelector
 import com.ptrbrynt.kotlin_bloc.compose.rememberSaveableBloc
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
@@ -45,9 +44,9 @@ class MainActivity : ComponentActivity() {
  * Creates a Counter based on [CounterBloc]
  */
 @Composable
-fun BlocCounter() {
-    val bloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) }
-
+fun BlocCounter(
+    bloc: CounterBloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) },
+) {
     CounterBase(
         bloc,
         onIncrement = {
@@ -60,9 +59,9 @@ fun BlocCounter() {
  * Creates a Counter based on [CounterCubit]
  */
 @Composable
-
-fun CubitCounter() {
-    val cubit = remember { CounterCubit() }
+fun CubitCounter(
+    cubit: CounterCubit = remember { CounterCubit() },
+) {
     CounterBase(
         cubit,
         onIncrement = { cubit.increment() }
@@ -75,9 +74,6 @@ fun CounterBase(
     onIncrement: () -> Unit,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
-    BlocListener(bloc) {
-        scaffoldState.snackbarHostState.showSnackbar("$it")
-    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -106,9 +102,8 @@ fun CounterBase(
 @Composable
 fun BlocSelectorCounter(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
+    bloc: CounterBloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) },
 ) {
-    val bloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) }
-
     Scaffold(
         scaffoldState = scaffoldState,
         floatingActionButton = {

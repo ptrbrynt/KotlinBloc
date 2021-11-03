@@ -1,17 +1,15 @@
 plugins {
     id 'java-library'
     id 'kotlin'
-    id 'org.jetbrains.dokka'
     id 'maven-publish'
 }
-
 
 publishing {
     publications {
         release(MavenPublication) {
             from components.java
             groupId = "com.ptrbrynt.kotlin-bloc"
-            artifactId = "core"
+            artifactId = "test"
         }
     }
 }
@@ -24,9 +22,12 @@ java {
 dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
 
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2'
-    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-    testImplementation 'app.cash.turbine:turbine:0.6.1'
-    testImplementation 'io.mockk:mockk:1.12.0'
+    implementation project(path: ':core')
 
+    implementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    implementation 'app.cash.turbine:turbine:0.6.1'
+    implementation 'io.mockk:mockk:1.12.0'
+
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2'
 }
