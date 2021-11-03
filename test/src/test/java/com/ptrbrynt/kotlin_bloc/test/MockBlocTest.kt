@@ -37,6 +37,8 @@ class MockBlocTest {
 
         whenListen(cubit, flowOf(0, 1, 2), initialState = 1)
 
+        assertEquals(1, cubit.state)
+
         testBloc(
             build = { cubit },
             expected = listOf(
@@ -46,7 +48,7 @@ class MockBlocTest {
             ),
         )
 
-        assertEquals(1, cubit.state)
+        assertEquals(2, cubit.state)
     }
 
     @Test
@@ -83,5 +85,7 @@ class MockBlocTest {
                 { equals(2) },
             ),
         )
+
+        assertEquals(2, bloc.state)
     }
 }

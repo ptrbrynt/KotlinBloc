@@ -8,6 +8,18 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.emptyFlow
 import kotlin.reflect.KClass
 
+/**
+ * Creates a mocked instance of the given [Cubit] type [C].
+ *
+ * Uses [mockk] under the hood.
+ *
+ * @param name Mock name
+ * @param relaxed Allows creation without any explicit behavior
+ * @param moreInterfaces Additional interfaces for this mock to implement
+ * @param relaxUnitFun Allows creation with no specific behaviour for Unit function
+ * @param block Block to execute after the mock has been created, with the mock as the receiver
+ * @see mockk
+ */
 inline fun <reified C : Cubit<State>, reified State> mockCubit(
     name: String? = null,
     relaxed: Boolean = false,
@@ -27,6 +39,18 @@ inline fun <reified C : Cubit<State>, reified State> mockCubit(
     }
 }
 
+/**
+ * Creates a mocked instance of the given [Bloc] type [B].
+ *
+ * Uses [mockk] under the hood.
+ *
+ * @param name Mock name
+ * @param relaxed Allows creation without any explicit behavior
+ * @param moreInterfaces Additional interfaces for this mock to implement
+ * @param relaxUnitFun Allows creation with no specific behaviour for Unit function
+ * @param block Block to execute after the mock has been created, with the mock as the receiver
+ * @see mockk
+ */
 inline fun <reified B : Bloc<Event, State>, reified Event, reified State> mockBloc(
     name: String? = null,
     relaxed: Boolean = false,
