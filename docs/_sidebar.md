@@ -5,6 +5,7 @@
   * Core Concepts
     * [Core](core-concepts.md)
     * [Bloc + Compose](bloc-compose.md)
+    * [Test](bloc-test.md)
   * [Naming Conventions](naming-conventions.md)
 * Tutorials
   * [Counter](tutorials/counter.md)

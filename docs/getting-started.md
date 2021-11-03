@@ -25,14 +25,15 @@ allprojects {
 
 Then add the dependency to your module-level `build.gradle` file. 
 
-!> Note: you only need one of the two available dependencies. The `compose` library includes the `core` library.
-
 ```groovy
 dependencies {
   // ...
 
   // Choose EITHER:
-  implementation 'com.github.ptrbrynt.KotlinBloc:compose:1.0' // For Jetpack Compose apps
-  implementation 'com.github.ptrbrynt.KotlinBloc:core:1.0' // The pure Kotlin library, for other stuff
+  implementation 'com.github.ptrbrynt.KotlinBloc:compose:1.1.0' // For Jetpack Compose apps
+  implementation 'com.github.ptrbrynt.KotlinBloc:core:1.1.0' // The pure Kotlin library, for other stuff
+  
+  // Optional test helpers:
+  testImplementation 'com.github.ptrbrynt.KotlinBloc:test:1.1.0'
 }
 ```
