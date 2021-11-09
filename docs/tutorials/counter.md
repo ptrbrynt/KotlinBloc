@@ -29,7 +29,7 @@ Finally, just add the following dependency to your module-level `build.gradle` f
 ```groovy
 dependencies {
   // ...
-	implementation 'com.github.ptrbrynt.KotlinBloc:compose:1.0'
+	implementation 'com.github.ptrbrynt.KotlinBloc:compose:2.0.0'
 }
 ```
 
@@ -47,9 +47,9 @@ Let's create a new class called `CounterObserver`:
  */
 
 class CounterObserver : BlocObserver() {
-    override fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {
+    override fun <B : BlocBase<State, *>, State> onChange(bloc: B, change: Change<State>) {
         super.onChange(bloc, change)
-        Log.i(bloc::class.simpleName, "$change")
+        Log.i(bloc::class.simpleName, change.toString())
     }
 }
 ```
@@ -72,10 +72,11 @@ Let's now create a `CounterCubit.kt` file, and implement our cubit class.
 
 It will expose an `increment` method which will add `1` to the current state.
 
-The type of state the `CounterCubit` is managing will just be an `Int`, and the initial state will be `0`.
+The type of state the `CounterCubit` is managing will just be an `Int`, and the initial state will be `0`. We won't be using side-effects, so we can set the side-effect type to `Unit`.
 
 ```kotlin
-class CounterCubit : Cubit<Int>(0) {
+@Parcelize
+class CounterCubit : Cubit<Int, Unit>(0), Parcelable {
   suspend fun increment() = emit(state + 1)
 }
 ```
@@ -88,11 +89,10 @@ Let's create a new file called `Counter.kt`. This will contain our composable fu
 /**
  * A widget which reacts to the provided [CounterCubit] and notifies it in response to user input.
  */
-
 @Composable
 fun Counter(
   scope: CoroutineScope = rememberCoroutineScope(),
-  cubit: CounterCubit = remember { CounterCubit() },
+  cubit: CounterCubit = rememberSaveable { CounterCubit() },
 ) {
     Scaffold(
         topBar = {

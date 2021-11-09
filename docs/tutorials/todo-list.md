@@ -31,7 +31,7 @@ Finally, just add the following dependencies to your module-level `build.gradle`
 ```groovy
 dependencies {
   // ...
-	implementation 'com.github.ptrbrynt.KotlinBloc:compose:1.0'
+	implementation 'com.github.ptrbrynt.KotlinBloc:compose:2.0.0'
   
   implementation "androidx.navigation:navigation-compose:2.4.0-alpha09"
   
@@ -147,7 +147,7 @@ data class TodosLoadSuccess(val todos: List<Todo>) : TodosState()
 Now we have our events and states, we can create our `TodosBloc` class:
 
 ```kotlin
-class TodosBloc(private val todoDao: TodoDao) : Bloc<TodosEvent, TodosState>(TodosLoading) {
+class TodosBloc(private val todoDao: TodoDao) : Bloc<TodosEvent, TodosState, Unit>(TodosLoading) {
     init {
       on<TodosInitialized> {
         emitEach(todoDao.getAllTodos().map { TodosLoadSuccess(it) })

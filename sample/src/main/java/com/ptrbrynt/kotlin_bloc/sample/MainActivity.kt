@@ -70,7 +70,7 @@ fun CubitCounter(
 
 @Composable
 fun CounterBase(
-    bloc: BlocBase<Int>,
+    bloc: BlocBase<Int, Unit>,
     onIncrement: () -> Unit,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {

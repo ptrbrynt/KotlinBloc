@@ -15,7 +15,7 @@ class MockBlocTest {
 
     @Test
     fun mockCubitTest() = runBlocking {
-        val cubit = mockCubit<CounterCubit, Int>()
+        val cubit = mockCubit<CounterCubit, Int, Unit>()
 
         whenListen(cubit, flowOf(0, 1, 2))
 
@@ -33,7 +33,7 @@ class MockBlocTest {
 
     @Test
     fun mockCubitTestWithInitialState() = runBlocking {
-        val cubit = mockCubit<CounterCubit, Int>()
+        val cubit = mockCubit<CounterCubit, Int, Unit>()
 
         whenListen(cubit, flowOf(0, 1, 2), initialState = 1)
 
@@ -53,7 +53,7 @@ class MockBlocTest {
 
     @Test
     fun mockBlocTest() = runBlocking {
-        val bloc = mockBloc<CounterBloc, CounterEvent, Int>()
+        val bloc = mockBloc<CounterBloc, CounterEvent, Int, Unit>()
 
         whenListen(bloc, flowOf(0, 1, 2))
 
@@ -71,7 +71,7 @@ class MockBlocTest {
 
     @Test
     fun mockBlocTestWithInitialState() = runBlocking {
-        val bloc = mockBloc<CounterBloc, CounterEvent, Int>()
+        val bloc = mockBloc<CounterBloc, CounterEvent, Int, Unit>()
 
         whenListen(bloc, flowOf(0, 1, 2), initialState = 2)
 

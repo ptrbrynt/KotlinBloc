@@ -10,25 +10,32 @@ import com.ptrbrynt.kotlin_bloc.core.Transition
 /**
  * A [BlocObserver] which logs all bloc events to the console.
  */
-
 class LoggingBlocObserver : BlocObserver() {
 
-    override fun <B : BlocBase<State>, State> onCreate(bloc: B) {
-        super.onCreate(bloc)
-        Log.i(bloc::class.simpleName, "Created")
-    }
-
-    override fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {
+    override fun <B : BlocBase<State, *>, State> onChange(bloc: B, change: Change<State>) {
         super.onChange(bloc, change)
         Log.i(bloc::class.simpleName, change.toString())
     }
 
-    override fun <B : Bloc<Event, State>, Event, State> onEvent(bloc: B, event: Event) {
+    override fun <B : BlocBase<*, *>> onCreate(bloc: B) {
+        super.onCreate(bloc)
+        Log.i(bloc::class.simpleName, "Created")
+    }
+
+    override fun <B : Bloc<Event, *, *>, Event> onEvent(bloc: B, event: Event) {
         super.onEvent(bloc, event)
         Log.i(bloc::class.simpleName, event.toString())
     }
 
-    override fun <B : Bloc<Event, State>, Event, State> onTransition(
+    override fun <B : BlocBase<*, SideEffect>, SideEffect> onSideEffect(
+        bloc: B,
+        sideEffect: SideEffect,
+    ) {
+        super.onSideEffect(bloc, sideEffect)
+        Log.i(bloc::class.simpleName, sideEffect.toString())
+    }
+
+    override fun <B : Bloc<Event, State, *>, Event, State> onTransition(
         bloc: B,
         transition: Transition<Event, State>,
     ) {

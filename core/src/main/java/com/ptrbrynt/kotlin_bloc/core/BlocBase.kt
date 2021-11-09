@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
  * @param initial The initial [State]
  */
 @Suppress("LeakingThis")
-abstract class BlocBase<State>(initial: State) {
+abstract class BlocBase<State, SideEffect>(initial: State) {
 
     init {
         Bloc.observer.onCreate(this)
@@ -28,6 +28,18 @@ abstract class BlocBase<State>(initial: State) {
                 collect { onChange(it) }
             }
         }
+
+    protected val mutableSideEffectFlow = MutableSharedFlow<SideEffect>().apply {
+        blocScope.launch {
+            collect { onSideEffect(it) }
+        }
+    }
+
+    /**
+     * The [Flow] of [SideEffect]s
+     */
+    val sideEffectFlow: Flow<SideEffect>
+        get() = mutableSideEffectFlow
 
     /**
      * The current [State] [Flow]
@@ -60,5 +72,23 @@ abstract class BlocBase<State>(initial: State) {
     open fun onChange(change: Change<State>) {
         Bloc.observer.onChange(this, change)
         this.state = change.newState
+    }
+
+    /**
+     * Called whenever a [SideEffect] is emitted.
+     *
+     * **Note: `super.onSideEffect` should always be called first.**
+     *
+     * ```kotlin
+     * override fun onSideEffect(sideEffect: SideEffect) {
+     *   // Always call super.onSideEffect first
+     *   super.onSideEffect(sideEffect)
+     *
+     *   // Custom logic goes here
+     * }
+     * ```
+     */
+    open fun onSideEffect(sideEffect: SideEffect) {
+        Bloc.observer.onSideEffect(this, sideEffect)
     }
 }

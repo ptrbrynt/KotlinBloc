@@ -39,7 +39,7 @@ import kotlinx.coroutines.flow.Flow
  */
 
 @Composable
-fun <B : BlocBase<State>, State> BlocComposer(
+fun <B : BlocBase<State, *>, State> BlocComposer(
     bloc: B,
     transformStates: Flow<State>.() -> Flow<State> = { this },
     content: @Composable (State) -> Unit,

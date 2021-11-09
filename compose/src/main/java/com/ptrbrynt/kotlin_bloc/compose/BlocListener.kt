@@ -8,51 +8,51 @@ import com.ptrbrynt.kotlin_bloc.core.BlocBase
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Takes a [bloc] and an [onState] callback and invokes [onState] in response to `state` changes
- * in the [bloc].
+ * Takes a [bloc] and an [onSideEffect] callback and invokes [onSideEffect] in response to side
+ * effects in the [bloc].
  *
- * It should be used for side-effects resulting from new `state`s being emitted by the [bloc] e.g.
+ * It should be used for side-effects resulting from new side-effects being emitted by the [bloc] e.g.
  * navigation, showing a snackbar etc.
  *
  * If you want to build composables in response to new states, use [BlocComposer]
  *
  * ```kotlin
- * BlocListener(bloc) { state ->
- *   // React to the new state here
+ * BlocListener(bloc) { sideEffect ->
+ *   // React to the new side effect here
  * }
  * ```
  *
- * * An optional [transformStates] can be implemented for more granular control over
+ * * An optional [transformSideEffects] can be implemented for more granular control over
  * the frequency and specificity with which transitions occur.
  *
- * For example, to debounce the state changes:
+ * For example, to debounce the side effects:
  *
  * ```kotlin
  * BlocListener(
  *   myBloc,
- *   transformStates = { this.debounce(1000) },
+ *   transformSideEffects = { this.debounce(1000) },
  * ) {
- *   // React to the new state here
+ *   // React to the new side-effect here
  * }
  * ```
  *
  * @param bloc The bloc or cubit that the [BlocListener] will interact with.
- * @param onState The callback function which will be invoked whenever a new `state` is emitted by the [bloc].
- * @param transformStates Provides more granular control over the [State] flow.
+ * @param onSideEffect The callback function which will be invoked whenever a new `state` is emitted by the [bloc].
+ * @param transformSideEffects Provides more granular control over the [State] flow.
  * @see BlocComposer
  */
 
 @Composable
-fun <B : BlocBase<State>, State> BlocListener(
+fun <B : BlocBase<*, SideEffect>, SideEffect> BlocListener(
     bloc: B,
-    transformStates: Flow<State>.() -> Flow<State> = { this },
-    onState: suspend (State) -> Unit,
+    transformSideEffects: Flow<SideEffect>.() -> Flow<SideEffect> = { this },
+    onSideEffect: suspend (SideEffect) -> Unit,
 ) {
-    val state by bloc.stateFlow.transformStates().collectAsState(initial = null)
+    val state by bloc.sideEffectFlow.transformSideEffects().collectAsState(initial = null)
 
     state?.let {
         LaunchedEffect(it) {
-            onState(it)
+            onSideEffect(it)
         }
     }
 }

@@ -7,12 +7,12 @@ import com.ptrbrynt.kotlin_bloc.compose.blocs.CounterEvent
 import com.ptrbrynt.kotlin_bloc.core.Bloc
 import io.mockk.mockk
 import io.mockk.verifyOrder
-import java.io.PrintStream
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
+import java.io.PrintStream
 
 @RunWith(AndroidJUnit4::class)
 @Config(shadows = [ShadowLog::class])
@@ -38,6 +38,7 @@ class LoggingBlocObserverTest {
             stream.println("I/CounterBloc: Increment")
             stream.println("I/CounterBloc: Change(state=0, newState=1)")
             stream.println("I/CounterBloc: Transition(state=0, event=Increment, newState=1)")
+            stream.println("I/CounterBloc: 1")
         }
     }
 }

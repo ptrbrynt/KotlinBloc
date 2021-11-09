@@ -45,7 +45,7 @@ import com.ptrbrynt.kotlin_bloc.core.BlocBase
  * @throws AssertionError if no [save] parameter is provided and the [State] type cannot be saved.
  */
 @Composable
-fun <State : Any, B : BlocBase<State>> rememberSaveableBloc(
+fun <State : Any, B : BlocBase<State, *>> rememberSaveableBloc(
     save: SaverScope.(B) -> State = {
         assert(canBeSaved(it))
         it.state

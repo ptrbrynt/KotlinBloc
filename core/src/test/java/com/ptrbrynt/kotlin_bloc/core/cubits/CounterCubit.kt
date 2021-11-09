@@ -3,7 +3,8 @@ package com.ptrbrynt.kotlin_bloc.core.cubits
 import com.ptrbrynt.kotlin_bloc.core.Change
 import com.ptrbrynt.kotlin_bloc.core.Cubit
 
-class CounterCubit(private val onChangeCallback: ((Change<Int>) -> Unit)? = null) : Cubit<Int>(0) {
+class CounterCubit(private val onChangeCallback: ((Change<Int>) -> Unit)? = null) :
+    Cubit<Int, Unit>(0) {
     suspend fun increment() = emit(state + 1)
     suspend fun decrement() = emit(state - 1)
 

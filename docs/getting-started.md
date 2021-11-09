@@ -30,10 +30,10 @@ dependencies {
   // ...
 
   // Choose EITHER:
-  implementation 'com.github.ptrbrynt.KotlinBloc:compose:1.1.0' // For Jetpack Compose apps
-  implementation 'com.github.ptrbrynt.KotlinBloc:core:1.1.0' // The pure Kotlin library, for other stuff
+  implementation 'com.github.ptrbrynt.KotlinBloc:compose:2.0.0' // For Jetpack Compose apps
+  implementation 'com.github.ptrbrynt.KotlinBloc:core:2.0.0' // The pure Kotlin library, for other stuff
   
   // Optional test helpers:
-  testImplementation 'com.github.ptrbrynt.KotlinBloc:test:1.1.0'
+  testImplementation 'com.github.ptrbrynt.KotlinBloc:test:2.0.0'
 }
 ```
