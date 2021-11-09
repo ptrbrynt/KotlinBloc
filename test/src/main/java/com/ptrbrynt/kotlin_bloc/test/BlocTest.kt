@@ -53,7 +53,6 @@ suspend fun <B : BlocBase<State, SideEffect>, State, SideEffect> testBloc(
 
     setUp()
 
-
     testStates(
         build = build,
         act = act,

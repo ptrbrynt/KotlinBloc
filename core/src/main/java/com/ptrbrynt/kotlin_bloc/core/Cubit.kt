@@ -40,5 +40,4 @@ abstract class Cubit<State, SideEffect>(initial: State) :
     override suspend fun emitSideEffects(sideEffects: Flow<SideEffect>) {
         sideEffects.onEach { emitSideEffect(it) }.launchIn(blocScope)
     }
-
 }
