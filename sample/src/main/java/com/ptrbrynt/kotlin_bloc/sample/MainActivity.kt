@@ -17,12 +17,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ptrbrynt.kotlin_bloc.compose.BlocComposer
 import com.ptrbrynt.kotlin_bloc.compose.BlocSelector
-import com.ptrbrynt.kotlin_bloc.compose.rememberSaveableBloc
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
 import com.ptrbrynt.kotlin_bloc.sample.ui.blocs.CounterBloc
 import com.ptrbrynt.kotlin_bloc.sample.ui.blocs.CounterEvent
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
  */
 @Composable
 fun BlocCounter(
-    bloc: CounterBloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) },
+    bloc: CounterBloc = rememberSaveable { CounterBloc(0) },
 ) {
     CounterBase(
         bloc,
@@ -102,7 +102,7 @@ fun CounterBase(
 @Composable
 fun BlocSelectorCounter(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
-    bloc: CounterBloc = rememberSaveableBloc(initialState = 0) { CounterBloc(it) },
+    bloc: CounterBloc = rememberSaveable { CounterBloc(0) },
 ) {
     Scaffold(
         scaffoldState = scaffoldState,

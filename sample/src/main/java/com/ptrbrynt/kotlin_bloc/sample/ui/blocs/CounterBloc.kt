@@ -1,10 +1,13 @@
 package com.ptrbrynt.kotlin_bloc.sample.ui.blocs
 
+import android.os.Parcelable
 import com.ptrbrynt.kotlin_bloc.core.Bloc
+import kotlinx.parcelize.Parcelize
 
 enum class CounterEvent { Increment, Decrement }
 
-class CounterBloc(initial: Int) : Bloc<CounterEvent, Int, Unit>(initial) {
+@Parcelize
+class CounterBloc(private val initial: Int) : Bloc<CounterEvent, Int, Unit>(initial), Parcelable {
 
     init {
         on<CounterEvent> { event ->
