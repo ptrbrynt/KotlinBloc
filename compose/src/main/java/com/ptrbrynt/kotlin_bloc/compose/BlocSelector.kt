@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.map
  */
 
 @Composable
-fun <B : BlocBase<State, *>, State, T> BlocSelector(
+fun <B : BlocBase<State>, State, T> BlocSelector(
     bloc: B,
     selector: (State) -> T,
     content: @Composable (T) -> Unit,

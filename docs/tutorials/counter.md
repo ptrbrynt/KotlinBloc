@@ -47,7 +47,7 @@ Let's create a new class called `CounterObserver`:
  */
 
 class CounterObserver : BlocObserver() {
-    override fun <B : BlocBase<State, *>, State> onChange(bloc: B, change: Change<State>) {
+    override fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {
         super.onChange(bloc, change)
         Log.i(bloc::class.simpleName, change.toString())
     }
@@ -72,11 +72,11 @@ Let's now create a `CounterCubit.kt` file, and implement our cubit class.
 
 It will expose an `increment` method which will add `1` to the current state.
 
-The type of state the `CounterCubit` is managing will just be an `Int`, and the initial state will be `0`. We won't be using side-effects, so we can set the side-effect type to `Unit`.
+The type of state the `CounterCubit` is managing will just be an `Int`, and the initial state will be `0`.
 
 ```kotlin
 @Parcelize
-class CounterCubit : Cubit<Int, Unit>(0), Parcelable {
+class CounterCubit : Cubit<Int>(0), Parcelable {
   suspend fun increment() = emit(state + 1)
 }
 ```
@@ -122,7 +122,6 @@ fun Counter(
 }
 
 @Preview
-
 @Composable
 fun CounterPreview() {
     Counter()

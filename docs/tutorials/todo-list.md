@@ -147,7 +147,7 @@ data class TodosLoadSuccess(val todos: List<Todo>) : TodosState()
 Now we have our events and states, we can create our `TodosBloc` class:
 
 ```kotlin
-class TodosBloc(private val todoDao: TodoDao) : Bloc<TodosEvent, TodosState, Unit>(TodosLoading) {
+class TodosBloc(private val todoDao: TodoDao) : Bloc<TodosEvent, TodosState>(TodosLoading) {
     init {
       on<TodosInitialized> {
         emitEach(todoDao.getAllTodos().map { TodosLoadSuccess(it) })

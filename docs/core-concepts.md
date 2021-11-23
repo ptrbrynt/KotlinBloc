@@ -17,17 +17,15 @@ A `Cubit` can expose functions which can be called to trigger state changes.
 We can create a `CounterCubit` like this:
 
 ```kotlin
-class CounterCubit: Cubit<Int, Unit>(0)
+class CounterCubit: Cubit<Int>(0)
 ```
 
 When creating a `Cubit`, we need to define the type of state which the `Cubit` will be managing. In the case of the `CounterCubit` above, the state can be represented via an `Int`, but in more complex cases it may be necessary to use a `class` instead of a primitive type.
 
-When creating a `Cubit`, we also need to define a type for possible side-effects of the `Cubit`. A side-effect is anything you want the `Cubit` to emit that is **not** a state. In this case, because we aren't going to use any side-effects, we have defined the side-effect type as `Unit`.
-
-The final thing we need to do when creating a `Cubit` is specify the initial state. We do this by passing the initial state into the constructor of the `Cubit` subclass. In the snippet above, we are setting the initial state to `0` internally, but we could also allow the `CounterCubit` to be more flexible by accepting a value in its own constructor:
+The second thing we need to do when creating a `Cubit` is specify the initial state. We do this by passing the initial state into the constructor of the `Cubit` subclass. In the snippet above, we are setting the initial state to `0` internally, but we could also allow the `CounterCubit` to be more flexible by accepting a value in its own constructor:
 
 ```kotlin
-class CounterCubit(initial: Int): Cubit<Int, Unit>(initial)
+class CounterCubit(initial: Int): Cubit<Int>(initial)
 ```
 
 This would allow us to instantiate different `CounterCubit` instances with different initial states, like this:
@@ -42,7 +40,7 @@ val cubitB = CounterCubit(10) // State starts at 10
 > Each `Cubit` has the ability to output a new state via `emit`.
 
 ```kotlin
-class CounterCubit : Cubit<Int, Unit>(0) {
+class CounterCubit : Cubit<Int>(0) {
   suspend fun increment() = emit(state + 1)
 }
 ```
@@ -120,14 +118,14 @@ suspend fun main() {
 
 ### Creating a Bloc
 
-Creating a `Bloc` is similar to creating a `Cubit` except, in addition to defining the state we'll be managing and the type of possible side-effects, we must also define the event type that the `Bloc` will be able to process.
+Creating a `Bloc` is similar to creating a `Cubit` except, in addition to defining the state we'll be managing, we must also define the event type that the `Bloc` will be able to process.
 
 > Events are input to a Bloc. They are commonly added in response to user interactions such as button presses, or lifecycle events like page loads.
 
 ```kotlin
 enum class CounterEvent { Incremented }
 
-class CounterBloc: Bloc<CounterEvent, Int, Unit>(0) {
+class CounterBloc: Bloc<CounterEvent, Int>(0) {
   // ...
 }
 ```
@@ -141,7 +139,7 @@ We can then use `on<CounterEvent>` to handle the `CounterEvent.Incremented` even
 ```kotlin
 enum class CounterEvent { Incremented }
 
-class CounterBloc: Bloc<CounterEvent, Int, Unit>(0) {
+class CounterBloc: Bloc<CounterEvent, Int>(0) {
   init {
     on<CounterEvent> {
       when (event) {
@@ -186,41 +184,6 @@ suspend fun main() {
 }
 ```
 
-## Side-effects
-
-`Bloc`s and `Cubit`s can each emit side-effects. These are secondary results of handling Bloc events or calling Cubit methods which are distinct from states.
-
-Side-effects can be used to trigger things like sending a notification to the user interface. They can be emitted using the `emitSideEffect` and `emitSideEffects` methods.
-
-Let's add a side-effect to our `CounterCubit` which emits a `String` each time the state is changed to an even number.
-
-```kotlin
-class CounterCubit : Cubit<Int, String>(0) { // Notice we have defined the type of Side Effect as String
-  suspend fun increment() { 
-    emit(state + 1)
-    if (state % 2 == 0) {
-      emitSideEffect("Here's an even number!")
-    }
-  }
-}
-```
-
-We can then observe side-effects emitted by the Cubit:
-
-```kotlin
-suspend fun main() {
-  val cubit = CounterCubit()
-	scope.launch {
-    cubit.sideEffectFlow.collect { println(it) }
-  }
-  cubit.increment()
-  cubit.increment()
-  // Side-effect will be emitted here.
-}
-```
-
- 
-
 ## BlocObserver
 
 Most applications will include a potentially large number of `Bloc`s and `Cubit`s. Implementing observation on every one of these classes individually can be cumbserome, especially if you want to do the same thing for each `Bloc` and `Cubit`.
@@ -233,30 +196,22 @@ To that end, the library includes a way of creating a global `BlocObserver`.
  */
 class LoggingBlocObserver : BlocObserver() {
 
-    override fun <B : BlocBase<State, *>, State> onChange(bloc: B, change: Change<State>) {
+    override fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {
         super.onChange(bloc, change)
         Log.i(bloc::class.simpleName, change.toString())
     }
 
-    override fun <B : BlocBase<*, *>> onCreate(bloc: B) {
+    override fun <B : BlocBase<*>> onCreate(bloc: B) {
         super.onCreate(bloc)
         Log.i(bloc::class.simpleName, "Created")
     }
 
-    override fun <B : Bloc<Event, *, *>, Event> onEvent(bloc: B, event: Event) {
+    override fun <B : Bloc<Event, *>, Event> onEvent(bloc: B, event: Event) {
         super.onEvent(bloc, event)
         Log.i(bloc::class.simpleName, event.toString())
     }
 
-    override fun <B : BlocBase<*, SideEffect>, SideEffect> onSideEffect(
-        bloc: B,
-        sideEffect: SideEffect,
-    ) {
-        super.onSideEffect(bloc, sideEffect)
-        Log.i(bloc::class.simpleName, sideEffect.toString())
-    }
-
-    override fun <B : Bloc<Event, State, *>, Event, State> onTransition(
+    override fun <B : Bloc<Event, State>, Event, State> onTransition(
         bloc: B,
         transition: Transition<Event, State>,
     ) {
@@ -297,7 +252,7 @@ Here's an example of a `CounterCubit`, and a `CounterBloc` with equivalent funct
 ##### CounterCubit
 
 ```kotlin
-class CounterCubit : Cubit<Int, Unit>(0) {
+class CounterCubit : Cubit<Int>(0) {
   suspend fun increment = emit(state + 1)
 }
 ```
@@ -307,7 +262,7 @@ class CounterCubit : Cubit<Int, Unit>(0) {
 ```kotlin
 enum class CounterEvent { Increment }
 
-class CounterBloc : Bloc<CounterEvent, Int, Unit>(0) {
+class CounterBloc : Bloc<CounterEvent, Int>(0) {
   init {
     on<CounterEvent> {
       when (event) {

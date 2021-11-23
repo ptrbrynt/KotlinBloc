@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.onEach
  * [whenListen] also handles stubbing the `state` of the [bloc] to stay in sync with the emitted
  * state.
  */
-fun <B : BlocBase<State, *>, State> whenListen(
+fun <B : BlocBase<State>, State> whenListen(
     bloc: B,
     states: Flow<State>,
     initialState: State? = null,
@@ -26,17 +26,4 @@ fun <B : BlocBase<State, *>, State> whenListen(
     if (initialState != null) {
         every { bloc.state } returns initialState
     }
-}
-
-/**
- * Creates a stub response for the `sideEffectFlow` property of the given [bloc].
- *
- * Use [whenListenToSideEffects] when you want to return a canned [Flow] of [SideEffect]s
- * for a [bloc] instance.
- */
-fun <B : BlocBase<*, SideEffect>, SideEffect> whenListenToSideEffects(
-    bloc: B,
-    sideEffects: Flow<SideEffect>,
-) {
-    every { bloc.sideEffectFlow } answers { sideEffects }
 }

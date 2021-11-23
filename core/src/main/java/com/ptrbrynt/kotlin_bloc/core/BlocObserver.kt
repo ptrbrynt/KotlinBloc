@@ -12,7 +12,7 @@ abstract class BlocObserver {
      *
      * @param bloc The [Bloc] or [Cubit] which was created.
      */
-    open fun <B : BlocBase<*, *>> onCreate(bloc: B) {}
+    open fun <B : BlocBase<*>> onCreate(bloc: B) {}
 
     /**
      * Called whenever an [event] is `add`ed to any [bloc].
@@ -20,7 +20,7 @@ abstract class BlocObserver {
      * @param bloc The [Bloc] to which the [Event] was `add`ed
      * @param event The [Event] added to the [Bloc]
      */
-    open fun <B : Bloc<Event, *, *>, Event> onEvent(bloc: B, event: Event) {}
+    open fun <B : Bloc<Event, *>, Event> onEvent(bloc: B, event: Event) {}
 
     /**
      * Called whenever a [Change] occurs in any [Bloc] or [Cubit].
@@ -31,7 +31,7 @@ abstract class BlocObserver {
      * @param bloc The [Bloc] or [Cubit] which emitted the [change]
      * @param change The [Change] that occurred within the [bloc]
      */
-    open fun <B : BlocBase<State, *>, State> onChange(bloc: B, change: Change<State>) {}
+    open fun <B : BlocBase<State>, State> onChange(bloc: B, change: Change<State>) {}
 
     /**
      * Called whenever a [Transition] occurs in any [Bloc].
@@ -43,18 +43,9 @@ abstract class BlocObserver {
      * @param bloc The [Bloc] in which the [transition] occurred
      * @param transition The [Transition] which occurred within the [bloc]
      */
-    open fun <B : Bloc<Event, State, *>, Event, State> onTransition(
+    open fun <B : Bloc<Event, State>, Event, State> onTransition(
         bloc: B,
         transition: Transition<Event, State>,
-    ) {
-    }
-
-    /**
-     * Called whenever a [SideEffect] is emitted by a [Bloc] or [Cubit].
-     */
-    open fun <B : BlocBase<*, SideEffect>, SideEffect> onSideEffect(
-        bloc: B,
-        sideEffect: SideEffect,
     ) {
     }
 }

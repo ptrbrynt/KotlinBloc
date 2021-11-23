@@ -27,7 +27,7 @@ class MainActivityTest {
 
     @Test
     fun blocCounterDisplaysBlocState() {
-        val bloc = mockBloc<CounterBloc, CounterEvent, Int, Unit>()
+        val bloc = mockBloc<CounterBloc, CounterEvent, Int>()
 
         val flow = MutableStateFlow(1)
 
@@ -48,7 +48,7 @@ class MainActivityTest {
 
     @Test
     fun blocCounterIncrementButtonAddsIncrement() {
-        val bloc = mockBloc<CounterBloc, CounterEvent, Int, Unit>()
+        val bloc = mockBloc<CounterBloc, CounterEvent, Int>()
 
         whenListen(bloc, emptyFlow(), initialState = 1)
 
@@ -65,7 +65,7 @@ class MainActivityTest {
 
     @Test
     fun cubitCounterDisplaysBlocState() {
-        val cubit = mockCubit<CounterCubit, Int, Unit>()
+        val cubit = mockCubit<CounterCubit, Int>()
 
         val flow = MutableStateFlow(1)
 
@@ -86,7 +86,7 @@ class MainActivityTest {
 
     @Test
     fun cubitCounterIncrementButtonCallsIncrement() {
-        val cubit = mockCubit<CounterCubit, Int, Unit>()
+        val cubit = mockCubit<CounterCubit, Int>()
 
         whenListen(cubit, emptyFlow(), initialState = 1)
 
@@ -103,7 +103,7 @@ class MainActivityTest {
 
     @Test
     fun blocSelectorCounterDisplaysBlocState() {
-        val bloc = mockBloc<CounterBloc, CounterEvent, Int, Unit>()
+        val bloc = mockBloc<CounterBloc, CounterEvent, Int>()
 
         val flow = MutableStateFlow(1)
 
@@ -124,7 +124,7 @@ class MainActivityTest {
 
     @Test
     fun blocSelectorCounterIncrementButtonAddsIncrement() {
-        val bloc = mockBloc<CounterBloc, CounterEvent, Int, Unit>()
+        val bloc = mockBloc<CounterBloc, CounterEvent, Int>()
 
         whenListen(bloc, emptyFlow(), initialState = 1)
 

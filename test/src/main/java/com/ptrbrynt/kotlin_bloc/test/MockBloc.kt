@@ -20,7 +20,7 @@ import kotlin.reflect.KClass
  * @param block Block to execute after the mock has been created, with the mock as the receiver
  * @see mockk
  */
-inline fun <reified C : Cubit<State, SideEffect>, reified State, reified SideEffect> mockCubit(
+inline fun <reified C : Cubit<State>, reified State> mockCubit(
     name: String? = null,
     relaxed: Boolean = false,
     vararg moreInterfaces: KClass<*>,
@@ -34,9 +34,7 @@ inline fun <reified C : Cubit<State, SideEffect>, reified State, reified SideEff
         relaxUnitFun = relaxUnitFun
     ) {
         every { stateFlow } answers { emptyFlow() }
-        every { sideEffectFlow } answers { emptyFlow() }
         coEvery { emit(any()) } returns Unit
-        coEvery { emitSideEffect(any()) } returns Unit
         block()
     }
 }
@@ -53,7 +51,7 @@ inline fun <reified C : Cubit<State, SideEffect>, reified State, reified SideEff
  * @param block Block to execute after the mock has been created, with the mock as the receiver
  * @see mockk
  */
-inline fun <reified B : Bloc<Event, State, SideEffect>, reified Event, State, SideEffect> mockBloc(
+inline fun <reified B : Bloc<Event, State>, reified Event, State> mockBloc(
     name: String? = null,
     relaxed: Boolean = false,
     vararg moreInterfaces: KClass<*>,
@@ -67,7 +65,6 @@ inline fun <reified B : Bloc<Event, State, SideEffect>, reified Event, State, Si
         relaxUnitFun = relaxUnitFun,
     ) {
         every { stateFlow } answers { emptyFlow() }
-        every { sideEffectFlow } answers { emptyFlow() }
         every { add(any()) } returns Unit
         block()
     }

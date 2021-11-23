@@ -14,7 +14,7 @@ object Decrement : CounterEvent()
 open class CounterBloc(
     private val onTransitionCallback: ((Transition<CounterEvent, Int>) -> Unit)? = null,
     private val onEventCallback: ((CounterEvent) -> Unit)? = null,
-) : Bloc<CounterEvent, Int, Unit>(0) {
+) : Bloc<CounterEvent, Int>(0) {
 
     init {
         on<Increment> {

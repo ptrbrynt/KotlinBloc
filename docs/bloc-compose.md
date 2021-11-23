@@ -33,17 +33,17 @@ BlocComposer(
 
 ### BlocListener
 
-`BlocListener` is a composable which takes a `bloc` and an `onSideEffect` callback. `onSideEffect` is invoked whenever the `bloc` emits a new side-effect.
+`BlocListener` is a composable which takes a `bloc` and an `onState` callback. `onState` is invoked whenever the `bloc` emits a new state.
 
 ```kotlin
 val bloc = remember { CounterBloc() }
 
-BlocListener(bloc) { sideEffect -> 
-  // Do something here based on the side effect
+BlocListener(bloc) { state -> 
+  // Do something here based on the state
 }
 ```
 
-For fine-grained control over when the `onSideEffect` callback is invoked, you can add a `transformSideEffects`. This allows you to transform the flow of side-effects emitted by the `bloc`. For example, you could filter out certain side-effects, or debounce the flow to prevent side-effect emissions from happening too quickly.
+For fine-grained control over when the `onState` callback is invoked, you can add a `transformStates`. This allows you to transform the flow of states emitted by the `bloc`. For example, you could filter out certain states, or debounce the flow to prevent state emissions from happening too quickly.
 
 ```kotlin
 val bloc = remember { CounterBloc() }
@@ -51,9 +51,9 @@ val bloc = remember { CounterBloc() }
 BlocListener(
   bloc,
   // Only react at most once per second
-  transformSideEffects = { this.debounce(1000) },
-) { sideEffect -> 
-  // Do something here based on the side effect
+  transformStates = { this.debounce(1000) },
+) { state -> 
+  // Do something here based on the state
 }
 ```
 

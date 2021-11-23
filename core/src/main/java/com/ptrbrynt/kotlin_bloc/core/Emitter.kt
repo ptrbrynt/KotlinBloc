@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Interface which can be implemented on any object which can [emit] a [State] or a [SideEffect]
  */
-interface Emitter<State, SideEffect> {
+interface Emitter<State> {
     /**
      * Emit a new [State]
      */
@@ -15,14 +15,4 @@ interface Emitter<State, SideEffect> {
      * [emit] each [State] which is emitted by the [states] [Flow].
      */
     suspend fun emitEach(states: Flow<State>)
-
-    /**
-     * Emit a new [SideEffect]
-     */
-    suspend fun emitSideEffect(sideEffect: SideEffect)
-
-    /**
-     * Emit a [Flow] of [SideEffect]s.
-     */
-    suspend fun emitSideEffects(sideEffects: Flow<SideEffect>)
 }

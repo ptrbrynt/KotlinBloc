@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 enum class CounterEvent { Increment, Decrement }
 
 @Parcelize
-class CounterBloc(private val initial: Int) : Bloc<CounterEvent, Int, Unit>(initial), Parcelable {
+class CounterBloc(private val initial: Int) : Bloc<CounterEvent, Int>(initial), Parcelable {
 
     init {
         on<CounterEvent> { event ->

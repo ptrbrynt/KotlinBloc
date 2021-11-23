@@ -12,7 +12,7 @@ data class MultiFlowNumberAdded(val number: Int) : MultiFlowEvent()
 
 @ExperimentalCoroutinesApi
 
-class MultiFlowBloc : Bloc<MultiFlowEvent, List<Int>, Unit>(emptyList()) {
+class MultiFlowBloc : Bloc<MultiFlowEvent, List<Int>>(emptyList()) {
     private val numbers = MutableStateFlow(emptyList<Int>())
 
     init {

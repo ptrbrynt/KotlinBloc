@@ -2,7 +2,7 @@ package com.ptrbrynt.kotlin_bloc.test.blocs.counter
 
 import com.ptrbrynt.kotlin_bloc.core.Bloc
 
-class CounterBloc : Bloc<CounterEvent, Int, Unit>(0) {
+class CounterBloc : Bloc<CounterEvent, Int>(0) {
     init {
         on<Incremented> {
             emit(state + 1)

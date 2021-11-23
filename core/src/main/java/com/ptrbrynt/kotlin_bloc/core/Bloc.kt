@@ -12,18 +12,14 @@ import kotlinx.coroutines.launch
  * Takes [Event]s as input and transforms them into a [Flow]
  * of [State]s as an output.
  *
- * Also emits a [Flow] of [SideEffect]s, which are non-state outputs emitted as a result of new
- * [Event]s.
- *
  * @param initial The initial [State]
  * @param Event The type of event this can receive
  * @param State The type of state this emits
- * @param SideEffect The type of side-effect this can emit
  * @see Cubit
  */
 @Suppress("LeakingThis")
-abstract class Bloc<Event, State, SideEffect>(initial: State) :
-    BlocBase<State, SideEffect>(initial) {
+abstract class Bloc<Event, State>(initial: State) :
+    BlocBase<State>(initial) {
     protected val eventFlow = MutableSharedFlow<Event>()
 
     init {
@@ -37,21 +33,13 @@ abstract class Bloc<Event, State, SideEffect>(initial: State) :
     }
 
     @PublishedApi
-    internal val emitter = object : Emitter<State, SideEffect> {
+    internal val emitter = object : Emitter<State> {
         override suspend fun emit(state: State) {
             mutableChangeFlow.emit(Change(this@Bloc.state, state))
         }
 
         override suspend fun emitEach(states: Flow<State>) {
             states.onEach { emit(it) }.launchIn(blocScope)
-        }
-
-        override suspend fun emitSideEffect(sideEffect: SideEffect) {
-            mutableSideEffectFlow.emit(sideEffect)
-        }
-
-        override suspend fun emitSideEffects(sideEffects: Flow<SideEffect>) {
-            sideEffects.onEach { emitSideEffect(it) }.launchIn(blocScope)
         }
     }
 
@@ -77,7 +65,7 @@ abstract class Bloc<Event, State, SideEffect>(initial: State) :
      * @param E The type of [Event] that this handles
      */
     protected inline fun <reified E : Event> on(
-        noinline mapEventToState: suspend Emitter<State, SideEffect>.(E) -> Unit,
+        noinline mapEventToState: suspend Emitter<State>.(E) -> Unit,
     ) {
         eventFlow
             .transformEvents()

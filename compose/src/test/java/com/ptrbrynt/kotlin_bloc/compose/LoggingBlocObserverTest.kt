@@ -38,7 +38,6 @@ class LoggingBlocObserverTest {
             stream.println("I/CounterBloc: Increment")
             stream.println("I/CounterBloc: Change(state=0, newState=1)")
             stream.println("I/CounterBloc: Transition(state=0, event=Increment, newState=1)")
-            stream.println("I/CounterBloc: 1")
         }
     }
 }

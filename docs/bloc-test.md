@@ -36,8 +36,6 @@ As well as the parameters shown above, `blocTest` also provides the following op
 * `setUp`: A function executed before `build` which can be used to set up dependencies or do any other initialization
 * `tearDown`: A function executed as the final step of the test, which can be used to perform cleanup
 * `skip`: An optional `Int` which indicates the number of states to ignore before beginning to make assertions
-* `skipSideEffects`: An optional `Int` which indicates the number of side-effects to ignore before beginning to make assertions
-* `expectedSideEffects`: Like `expected`, but for side-effects.
 * `verify`: A function executed after the assertion step, which can be used to perform additional checks and verification
 
 ## `mockBloc`,  `mockCubit` and `whenListen`
@@ -52,7 +50,7 @@ The `whenListen` method is provided as a simple way of stubbing the state flow e
 class MyComposableTest {
   @Test
   fun testWithMockCubit() {
-    val cubit = mockCubit<CounterCubit, Int, Unit>() // Here, Int represents the state type and Unit is the side-effect type
+    val cubit = mockCubit<CounterCubit, Int>() // Here, Int represents the state type
     
     whenListen(cubit, flowOf(1,2,3)) // This line sets up the cubit to emit the numbers 1, 2, and 3 in that order.
     
@@ -61,11 +59,9 @@ class MyComposableTest {
   
   @Test
   fun testWithMockBloc() {
-    val bloc = mockBloc<CounterBloc, CounterEvent, Int, String>()
+    val bloc = mockBloc<CounterBloc, CounterEvent, Int>()
     
     whenListen(bloc, flowOf(1,2,3), initialState = 0) // You can pass an optional initial state.
-    
-    whenListenToSideEffects(bloc, flowOf("hello")) // You can also stub side-effect emission
     
     // Do some testing...
   }
