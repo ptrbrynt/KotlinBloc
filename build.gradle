@@ -1,8 +1,7 @@
 buildscript {
     ext {
-        kotlin_version = '1.5.31'
-        compose_version = '1.0.4'
-
+        kotlin_version = '1.6.10'
+        compose_version = '1.1.0'
     }
     repositories {
         google()
@@ -12,16 +11,16 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:7.0.3"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.31"
+        classpath "com.android.tools.build:gradle:7.0.4"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
         classpath 'org.jlleitschuh.gradle:ktlint-gradle:10.2.0'
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.5.30"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.6.10"
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
 
 plugins {
-    id("org.jetbrains.dokka") version "1.5.30"
+    id("org.jetbrains.dokka") version "1.6.10"
 }
 
 subprojects {

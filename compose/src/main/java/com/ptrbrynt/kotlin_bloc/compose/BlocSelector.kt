@@ -1,9 +1,10 @@
 package com.ptrbrynt.kotlin_bloc.compose
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import com.ptrbrynt.kotlin_bloc.core.BlocBase
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 
 /**
@@ -32,7 +33,9 @@ fun <B : BlocBase<State>, State, T> BlocSelector(
     selector: (State) -> T,
     content: @Composable (T) -> Unit,
 ) {
-    val state by bloc.stateFlow.map { selector(it) }.collectAsState(initial = selector(bloc.state))
+    val state by produceState(initialValue = selector(bloc.state)) {
+        bloc.stateFlow.map { selector(it) }.collect { value = it }
+    }
 
     content(state)
 }
